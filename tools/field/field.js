@@ -24,6 +24,19 @@ const SCREENS = ['square','hex','ascii','dither','glitch'];
 const MATERIALS = ['none','glass','metal','sand','liquid','molten'];
 const BLENDS = ['normal','multiply','screen','add','difference','overlay'];
 const CURSORS = ['off','ripple','lens','vortex','push'];
+// Artwork aspect — 0 means "fill the viewport".
+const ASPECTS = { Fill: 0, '9:16': 9/16, '4:5': 4/5, '1:1': 1, '5:4': 5/4, '3:2': 3/2, '16:9': 16/9 };
+// Harmony rules: hue offsets (turns) applied to the base for each of the 4 stops.
+const HARMONY = {
+  Mono:       [0, 0, 0, 0],
+  Analogous:  [-0.08, -0.03, 0.03, 0.08],
+  Complement: [0, 0, 0.5, 0.5],
+  Triad:      [0, 1 / 3, 2 / 3, 1 / 3],
+};
+const MASK_FONTS = {
+  'Plex Sans': "'IBM Plex Sans'", 'Plex Mono': "'IBM Plex Mono'",
+  Serif: 'Georgia, serif', Sans: 'Helvetica, Arial, sans-serif',
+};
 
 const opts = (arr) => Object.fromEntries(arr.map((s, i) => [s.toUpperCase(), i]));
 
@@ -53,6 +66,15 @@ const params = {
   liq: 0.8, mix: 0.85, split: 0, panX: 0, panY: 0,
   cursor: 0, cursorAmt: 1,
   animate: true,
+  // frame
+  aspect: 0, frameSize: 100, frameCorners: 0, frameShadow: false, frameBg: '#0d0d0f',
+  // text / logo mask
+  maskOn: false, maskText: 'FIELD', maskFont: "'IBM Plex Sans'", maskSize: 18,
+  maskWeight: 700, maskInvert: false, logoScale: 30,
+  maskBgMode: 'dark', maskBgA: '#08080a', maskBgB: '#232331',
+  // colour harmony + camera
+  harmony: 'off', baseColor: '#2fa3b8',
+  camFlip: true,
 };
 const DEFAULTS = structuredClone(params);
 
@@ -1024,8 +1046,191 @@ void main(){
 /////////////////////////////////////////////////////////////////////////////
 const tool = createTool({ name: 'FIELD', version: '0.1' });
 let P = null, prog = null, t = 0;
+let gField = null, gMask = null, gLogo = null;
 let glyphTex = null, blankTex = null, srcImg = null, hasTex = 0, texAspect = 1;
+let logoImg = null, maskDirty = true;
+let camStream = null, camVideo = null, gCam = null;
 const mouse = { x: 0.5, y: 0.5 };
+
+// The artwork rect: frameSize shrinks it, aspect constrains its shape. The shader
+// renders at exactly this size, so what you see is 1:1 with what it computed.
+function frameRect() {
+  const s = params.frameSize / 100;
+  let aw = P.width * s, ah = P.height * s;
+  const ar = params.aspect;
+  if (ar > 0) { if (aw / ah > ar) aw = ah * ar; else ah = aw / ar; }
+  const w = Math.max(2, Math.round(aw)), h = Math.max(2, Math.round(ah));
+  return { x: Math.round((P.width - w) / 2), y: Math.round((P.height - h) / 2), w, h };
+}
+
+function ensureBuffers(w, h) {
+  if (!gField) {
+    gField = P.createGraphics(w, h, P.WEBGL);
+    gField.pixelDensity(1);
+    gField.noStroke();
+    prog = gField.createShader(VERT, FRAG);
+    maskDirty = true;
+    return;
+  }
+  if (gField.width !== w || gField.height !== h) {
+    gField.resizeCanvas(w, h);
+    maskDirty = true;
+  }
+}
+
+// Mask is a luminance stencil: white = field shows through, black = flat background.
+// Inverting swaps which side the field fills.
+function buildMask(w, h) {
+  if (!gMask) {
+    gMask = P.createGraphics(w, h);
+    gMask.pixelDensity(1);
+  } else if (gMask.width !== w || gMask.height !== h) {
+    gMask.resizeCanvas(w, h);
+  }
+  const ctx = gMask.drawingContext;
+  const ink = params.maskInvert ? '#000000' : '#ffffff';
+  const paper = params.maskInvert ? '#ffffff' : '#000000';
+  ctx.save();
+  ctx.fillStyle = paper;
+  ctx.fillRect(0, 0, w, h);
+
+  const txt = (params.maskText || '').trim();
+  const fs = h * params.maskSize / 100;
+  let logoW = 0, logoH = 0;
+  if (logoImg) {
+    logoW = w * params.logoScale / 100;
+    logoH = logoW * (logoImg.naturalHeight / Math.max(logoImg.naturalWidth, 1));
+  }
+  const gap = (txt && logoImg) ? fs * 0.45 : 0;
+  let y = (h - (logoH + gap + (txt ? fs : 0))) / 2;
+
+  if (logoImg) {
+    // silhouette the logo from its own alpha, so a transparent PNG/SVG stencils cleanly
+    if (!gLogo) gLogo = document.createElement('canvas');
+    gLogo.width = Math.max(1, Math.ceil(logoW));
+    gLogo.height = Math.max(1, Math.ceil(logoH));
+    const lc = gLogo.getContext('2d');
+    lc.clearRect(0, 0, gLogo.width, gLogo.height);
+    lc.drawImage(logoImg, 0, 0, gLogo.width, gLogo.height);
+    lc.globalCompositeOperation = 'source-in';
+    lc.fillStyle = ink;
+    lc.fillRect(0, 0, gLogo.width, gLogo.height);
+    lc.globalCompositeOperation = 'source-over';
+    ctx.drawImage(gLogo, (w - logoW) / 2, y, logoW, logoH);
+    y += logoH + gap;
+  }
+  if (txt) {
+    ctx.fillStyle = ink;
+    ctx.font = `${params.maskWeight} ${fs}px ${params.maskFont}, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(txt, w / 2, y);
+  }
+  ctx.restore();
+}
+
+function maskBg() {
+  if (params.maskBgMode === 'light') return [hexToRGB('#f4f4f2'), hexToRGB('#f4f4f2'), 0];
+  if (params.maskBgMode === 'gradient') return [hexToRGB(params.maskBgA), hexToRGB(params.maskBgB), 1];
+  return [hexToRGB('#08080a'), hexToRGB('#08080a'), 0];
+}
+
+function rgbToHsl([r, g, b]) {
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  let h = 0;
+  if (d) {
+    if (mx === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+    else if (mx === g) h = ((b - r) / d + 2) / 6;
+    else h = ((r - g) / d + 4) / 6;
+  }
+  const l = (mx + mn) / 2;
+  return [h, d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1)), l];
+}
+
+function hslToHex(h, s, l) {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h * 6) % 2) - 1));
+  const m = l - c / 2;
+  const seg = ((Math.floor(h * 6) % 6) + 6) % 6;
+  const rgb = [[c, x, 0], [x, c, 0], [0, c, x], [0, x, c], [x, 0, c], [c, 0, x]][seg];
+  const hx = (v) => Math.round(Math.min(1, Math.max(0, v + m)) * 255).toString(16).padStart(2, '0');
+  return '#' + hx(rgb[0]) + hx(rgb[1]) + hx(rgb[2]);
+}
+
+// Derive the 4 ramp stops from one base colour: hue follows the harmony rule,
+// lightness always climbs dark -> light so the ramp still reads as a gradient.
+function applyHarmony() {
+  const offs = HARMONY[params.harmony];
+  if (!offs) return;
+  const [h, s] = rgbToHsl(hexToRGB(params.baseColor));
+  const sat = Math.max(s, 0.25);
+  const L = [0.10, 0.33, 0.58, 0.88];
+  const S = params.harmony === 'Mono'
+    ? [sat * 0.75, sat, sat * 0.8, sat * 0.35]
+    : [sat * 0.9, sat, sat * 0.85, sat * 0.4];
+  const stops = offs.map((o, i) => hslToHex((h + o + 1) % 1, Math.min(1, S[i]), L[i]));
+  [params.c0, params.c1, params.c2, params.c3] = stops;
+  return stops;
+}
+
+// Camera: the stream is pumped into a graphics buffer each frame rather than bound
+// directly, so Flip is a plain mirrored blit and the texture upload path is the
+// same one a dropped image uses.
+function attachStream(stream) {
+  stopCamera();
+  camStream = stream;
+  camVideo = document.createElement('video');
+  camVideo.autoplay = true;
+  camVideo.playsInline = true;
+  camVideo.muted = true;
+  camVideo.srcObject = stream;
+  const go = camVideo.play();
+  if (go && go.catch) go.catch(() => {});
+}
+
+async function startCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return 'unsupported';
+  try {
+    attachStream(await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false }));
+    return 'on';
+  } catch (err) {
+    console.warn('FIELD: camera unavailable —', err && err.message);
+    return 'denied';
+  }
+}
+
+function stopCamera() {
+  if (camStream) camStream.getTracks().forEach((tr) => tr.stop());
+  camStream = null;
+  if (camVideo) { camVideo.srcObject = null; camVideo = null; }
+}
+
+function pumpCamera() {
+  if (!camVideo || camVideo.readyState < 2) return false;
+  const vw = camVideo.videoWidth, vh = camVideo.videoHeight;
+  if (!vw || !vh) return false;
+  if (!gCam) {
+    gCam = P.createGraphics(vw, vh);
+    gCam.pixelDensity(1);
+  } else if (gCam.width !== vw || gCam.height !== vh) {
+    gCam.resizeCanvas(vw, vh);
+  }
+  const ctx = gCam.drawingContext;
+  ctx.save();
+  if (params.camFlip) { ctx.translate(vw, 0); ctx.scale(-1, 1); }
+  ctx.drawImage(camVideo, 0, 0, vw, vh);
+  ctx.restore();
+  srcImg = gCam; hasTex = 1; texAspect = vw / vh;
+  return true;
+}
+
+function pickFile(accept, cb) {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = accept; inp.style.display = 'none';
+  inp.addEventListener('change', () => { const f = inp.files && inp.files[0]; if (f) cb(f); inp.remove(); });
+  document.body.appendChild(inp);
+  inp.click();
+}
 
 // ASCII atlas: 10 cells of increasing ink, white on black, sampled by .r
 function buildGlyphAtlas(p) {
@@ -1049,7 +1254,7 @@ function hexToRGB(h) {
 
 function setUniforms() {
   const s = prog;
-  s.setUniform('u_res', [P.width, P.height]);
+  s.setUniform('u_res', [gField.width, gField.height]);
   s.setUniform('u_time', t);
   s.setUniform('u_seed', params.seed);
   s.setUniform('u_scale', params.zoom);
@@ -1084,11 +1289,13 @@ function setUniforms() {
   s.setUniform('u_mix', params.mix);
   s.setUniform('u_split', params.split);
   s.setUniform('u_pan', [params.panX, params.panY]);
-  s.setUniform('u_mask', blankTex);
-  s.setUniform('u_hasMask', 0);
-  s.setUniform('u_maskBg', [0, 0, 0]);
-  s.setUniform('u_maskBg2', [0, 0, 0]);
-  s.setUniform('u_maskGrad', 0);
+  const showMask = params.maskOn && gMask && ((params.maskText || '').trim() || logoImg);
+  const [bgA, bgB, bgGrad] = maskBg();
+  s.setUniform('u_mask', showMask ? gMask : blankTex);
+  s.setUniform('u_hasMask', showMask ? 1 : 0);
+  s.setUniform('u_maskBg', bgA);
+  s.setUniform('u_maskBg2', bgB);
+  s.setUniform('u_maskGrad', bgGrad);
   s.setUniform('u_mouse', [mouse.x, mouse.y]);
   s.setUniform('u_mouseAmt', params.cursor > 0 ? params.cursorAmt : 0);
   s.setUniform('u_mouseMode', params.cursor);
@@ -1098,31 +1305,62 @@ function setUniforms() {
 tool.startSketch((p) => {
   P = p;
   p.setup = () => {
-    p.createCanvas(p.windowWidth, p.windowHeight, p.WEBGL);
-    p.setAttributes('preserveDrawingBuffer', true);
+    // Main canvas is 2D: the frame needs rounded-rect clipping and a drop shadow,
+    // which are Canvas2D operations. The shader renders into gField and is
+    // composited into the artwork rect each frame.
+    p.createCanvas(p.windowWidth, p.windowHeight);
     p.pixelDensity(1);
-    p.noStroke();
-    prog = p.createShader(VERT, FRAG);
     glyphTex = buildGlyphAtlas(p);
     blankTex = p.createGraphics(1, 1);
     blankTex.pixelDensity(1);
     blankTex.background(0);
+    const r = frameRect();
+    ensureBuffers(r.w, r.h);
   };
   p.windowResized = () => p.resizeCanvas(p.windowWidth, p.windowHeight);
   p.draw = () => {
+    const r = frameRect();
+    ensureBuffers(r.w, r.h);
     if (!prog) return;
+    if (maskDirty) { buildMask(r.w, r.h); maskDirty = false; }
+    if (camStream) pumpCamera();
     if (params.animate) t += (p.deltaTime / 1000) * params.speed;
-    p.shader(prog);
+
+    gField.shader(prog);
     setUniforms();
-    p.rect(0, 0, p.width, p.height);
+    gField.rect(0, 0, gField.width, gField.height);
+
+    const ctx = p.drawingContext;
+    ctx.save();
+    ctx.fillStyle = params.frameBg;
+    ctx.fillRect(0, 0, p.width, p.height);
+    const rad = Math.max(0, Math.min(params.frameCorners, Math.min(r.w, r.h) / 2));
+    if (params.frameShadow) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.55)';
+      ctx.shadowBlur = Math.max(10, Math.min(r.w, r.h) * 0.05);
+      ctx.shadowOffsetY = Math.max(4, Math.min(r.w, r.h) * 0.018);
+      ctx.beginPath(); ctx.roundRect(r.x, r.y, r.w, r.h, rad);
+      ctx.fillStyle = '#000';
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.beginPath(); ctx.roundRect(r.x, r.y, r.w, r.h, rad);
+    ctx.clip();
+    ctx.drawImage(gField.canvas, r.x, r.y, r.w, r.h);
+    ctx.restore();
+    ctx.restore();
   };
 });
 
 // pointer -> u_mouse (normalized), on the canvas host so the pane never triggers it
 tool.canvasHost.addEventListener('pointermove', (e) => {
-  const r = tool.canvasHost.getBoundingClientRect();
-  mouse.x = (e.clientX - r.left) / r.width;
-  mouse.y = 1 - (e.clientY - r.top) / r.height;
+  if (!P || !gField) return;
+  const b = tool.canvasHost.getBoundingClientRect();
+  const r = frameRect();
+  mouse.x = (e.clientX - b.left - r.x) / r.w;
+  mouse.y = 1 - (e.clientY - b.top - r.y) / r.h;
 });
 
 // image drop
@@ -1170,9 +1408,22 @@ fCol.addBinding(params, 'palette', { label: 'Palette', options: Object.fromEntri
   .on('change', (e) => {
     const stops = PALETTES[e.value];
     if (!stops) return;
+    params.harmony = 'off';
     [params.c0, params.c1, params.c2, params.c3] = stops;
     tool.pane.refresh();
   });
+const onHarmony = () => { if (applyHarmony()) tool.pane.refresh(); };
+fCol.addBinding(params, 'harmony', {
+  label: 'Harmony',
+  options: { Off: 'off', ...Object.fromEntries(Object.keys(HARMONY).map((k) => [k, k])) },
+}).on('change', onHarmony);
+fCol.addBinding(params, 'baseColor', { label: 'Base' }).on('change', onHarmony);
+fCol.addButton({ title: 'Random Base' }).on('click', () => {
+  params.baseColor = hslToHex(Math.random(), 0.5 + Math.random() * 0.4, 0.45 + Math.random() * 0.15);
+  if (params.harmony === 'off') params.harmony = 'Analogous';
+  applyHarmony();
+  tool.pane.refresh();
+});
 fCol.addBinding(params, 'c0', { label: 'Stop 1', view: 'color' });
 fCol.addBinding(params, 'c1', { label: 'Stop 2', view: 'color' });
 fCol.addBinding(params, 'c2', { label: 'Stop 3', view: 'color' });
@@ -1194,11 +1445,61 @@ fSrc.addBinding(params, 'mix', { label: 'Photo Blend', min: 0, max: 1, step: 0.0
 fSrc.addBinding(params, 'split', { label: 'Before/After', min: 0, max: 1, step: 0.01 });
 fSrc.addBinding(params, 'panX', { label: 'Pan X', min: -0.5, max: 0.5, step: 0.01 });
 fSrc.addBinding(params, 'panY', { label: 'Pan Y', min: -0.5, max: 0.5, step: 0.01 });
-fSrc.addButton({ title: 'Clear Image' }).on('click', () => { hasTex = 0; srcImg = null; });
+fSrc.addButton({ title: 'Load Image…' }).on('click', () => {
+  pickFile('image/*', (file) => {
+    const url = URL.createObjectURL(file);
+    P.loadImage(url, (img) => { stopCamera(); srcImg = img; hasTex = 1; texAspect = img.width / img.height; URL.revokeObjectURL(url); },
+      () => URL.revokeObjectURL(url));
+  });
+});
+const camBtn = fSrc.addButton({ title: 'Start Camera' });
+camBtn.on('click', async () => {
+  if (camStream) { stopCamera(); hasTex = 0; srcImg = null; camBtn.title = 'Start Camera'; return; }
+  camBtn.title = 'Starting…';
+  const state = await startCamera();
+  camBtn.title = state === 'on' ? 'Stop Camera' : (state === 'denied' ? 'Camera Denied' : 'No Camera');
+});
+fSrc.addBinding(params, 'camFlip', { label: 'Flip' });
+fSrc.addButton({ title: 'Clear Image' }).on('click', () => {
+  stopCamera();
+  camBtn.title = 'Start Camera';
+  hasTex = 0; srcImg = null;
+});
 
 const fCur = main.addFolder({ title: 'CURSOR', expanded: false });
 fCur.addBinding(params, 'cursor', { label: 'Type', options: opts(CURSORS) });
 fCur.addBinding(params, 'cursorAmt', { label: 'Impact', min: 0, max: 3, step: 0.01 });
+
+const fFrame = main.addFolder({ title: 'FRAME', expanded: false });
+fFrame.addBinding(params, 'aspect', { label: 'Aspect', options: ASPECTS });
+fFrame.addBinding(params, 'frameSize', { label: 'Size', min: 20, max: 100, step: 1 });
+fFrame.addBinding(params, 'frameCorners', { label: 'Corners', min: 0, max: 120, step: 1 });
+fFrame.addBinding(params, 'frameShadow', { label: 'Drop Shadow' });
+fFrame.addBinding(params, 'frameBg', { label: 'Backdrop' });
+
+// Every mask control rebuilds the stencil; the field itself is untouched.
+const fMask = main.addFolder({ title: 'TEXT & LOGO', expanded: false });
+const md = (b) => b.on('change', () => { maskDirty = true; });
+fMask.addBinding(params, 'maskOn', { label: 'Enable' });
+md(fMask.addBinding(params, 'maskText', { label: 'Text' }));
+md(fMask.addBinding(params, 'maskFont', { label: 'Font', options: MASK_FONTS }));
+md(fMask.addBinding(params, 'maskSize', { label: 'Size %', min: 4, max: 60, step: 1 }));
+md(fMask.addBinding(params, 'maskWeight', { label: 'Weight', options: { Light: 300, Regular: 400, Medium: 500, Bold: 700 } }));
+md(fMask.addBinding(params, 'maskInvert', { label: 'Invert Fill' }));
+md(fMask.addBinding(params, 'logoScale', { label: 'Logo %', min: 5, max: 90, step: 1 }));
+fMask.addButton({ title: 'Load Logo…' }).on('click', () => {
+  pickFile('image/*', (file) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { logoImg = img; maskDirty = true; params.maskOn = true; tool.pane.refresh(); URL.revokeObjectURL(url); };
+    img.onerror = () => URL.revokeObjectURL(url);
+    img.src = url;
+  });
+});
+fMask.addButton({ title: 'Clear Logo' }).on('click', () => { logoImg = null; maskDirty = true; });
+fMask.addBinding(params, 'maskBgMode', { label: 'Background', options: { Dark: 'dark', Light: 'light', Gradient: 'gradient' } });
+fMask.addBinding(params, 'maskBgA', { label: 'Grad Top' });
+fMask.addBinding(params, 'maskBgB', { label: 'Grad Bottom' });
 
 /////////////////////////////////////////////////////////////////////////////
 // Presets + export
@@ -1217,6 +1518,7 @@ function applyPreset(name) {
   const pr = typeof name === 'string' ? presets[name] : name;
   if (!pr) return;
   Object.assign(params, structuredClone(DEFAULTS), pr);
+  maskDirty = true;
   tool.pane.refresh();
 }
 
@@ -1232,7 +1534,7 @@ function randomize() {
   [params.c0, params.c1, params.c2, params.c3] = PALETTES[pn];
 }
 
-attachExport(tool.pages.export, { getCanvas: () => tool.getCanvas(), name: 'field' });
+attachExport(tool.pages.export, { getCanvas: () => P.canvas, name: 'field' });
 attachPresets(tool.pages.options, { pane: tool.pane, params, presets, randomize, onApply: applyPreset });
 
-exposeDebug('field', { params, applyPreset, randomize, FIELDS, LENSES, setUniforms });
+exposeDebug('field', { params, applyPreset, randomize, FIELDS, LENSES, ASPECTS, HARMONY, frameRect, setUniforms, applyHarmony, attachStream, stopCamera, isCamOn: () => !!camStream, markMaskDirty: () => { maskDirty = true; } });
