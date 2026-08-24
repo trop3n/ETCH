@@ -13,7 +13,7 @@ python3 -m http.server 8000
 ```
 
 Then open `http://localhost:8000/` — the **Etch stack** (the current
-focus, 18 tools) plus the **Classic** raster tools (12 earlier experiments), all
+focus, 19 tools) plus the **Classic** raster tools (12 earlier experiments), all
 on one page. Or navigate directly to `tools/<name>/`.
 
 > After editing a shared module under `js/etch/`, hard-refresh (Ctrl/Cmd+Shift+R)
@@ -22,7 +22,7 @@ on one page. Or navigate directly to `tools/<name>/`.
 
 ## The tools
 
-### Etch stack (18)
+### Etch stack (19)
 
 | Tool | What it does |
 |---|---|
@@ -42,13 +42,15 @@ on one page. Or navigate directly to `tools/<name>/`.
 | **SKAAAN** | Scan-line displacement glitch — shift / scale / rotate / noise an image as a line sweeps it |
 | **STIIL** | Abstract graphics from images via stacked artistic effects |
 | **BOIDS** | Flocking simulation with shape, skew & velocity color |
+| **SHAPES** | Media resolved into a grid of shapes by luminance — 7 tone slots, each its own shape & colour |
 | **TERMNL** | Text-native generative terminal — 12 character engines, 4 modes, .txt/.ans export |
 | **FIELD** | 24 procedural field engines mapped through conformal lenses, layered, re-lit & screened |
 
-### Classic (12)
+### Classic (11)
 The original vanilla-Canvas/WebGL experiments, in the Classic Tools section of
 the main page: dithering, cellular-automata, gradient-map, shapes, text,
 pixel-flow, pixelator, srt2video, video2midi, flipdigits, blob-tracker, mesher.
+(`shapes` graduated to the Etch stack.)
 Preserved as-is.
 
 ## Tech & architecture

@@ -4,85 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval' 'sha256-33QhukOHQjtzHROwgmo7GDfhnQSX74ZiwH1eNmnBKH4=' 'sha256-lq2EYejLTZBv4UnOsSmRgaf2GaQGP3lb3kSIeXyOEnY='; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data: blob:; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
-  <title>Shapes — Etch</title>
+  <title>SHAPES — Etch</title>
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="tool-layout" id="app">
-    <aside class="tool-sidebar">
-      <a href="../../" class="back-link">&larr; Tools</a>
-      <h1>Shapes</h1>
-      <div id="source-controls"></div>
-      <hr class="separator">
-      <div class="control-group">
-        <label>Shape</label>
-        <select id="shape">
-          <option value="circle">Circle</option>
-          <option value="square">Square</option>
-          <option value="triangle">Triangle</option>
-          <option value="diamond">Diamond</option>
-          <option value="line">Line</option>
-          <option value="cross">Cross</option>
-          <option value="ring">Ring</option>
-          <option value="hexagon">Hexagon</option>
-        </select>
-      </div>
-      <div class="control-group">
-        <label>Grid Size</label>
-        <div class="radio-row">
-          <input type="radio" name="grid" id="g4" value="4"><label for="g4">4</label>
-          <input type="radio" name="grid" id="g8" value="8"><label for="g8">8</label>
-          <input type="radio" name="grid" id="g16" value="16" checked><label for="g16">16</label>
-          <input type="radio" name="grid" id="g32" value="32"><label for="g32">32</label>
-          <input type="radio" name="grid" id="g64" value="64"><label for="g64">64</label>
-          <input type="radio" name="grid" id="g128" value="128"><label for="g128">128</label>
-        </div>
-      </div>
-      <hr class="separator">
-      <div class="control-group">
-        <label>Colors</label>
-        <div class="color-swatch-row" id="color-swatches"></div>
-      </div>
-      <hr class="separator">
-      <div class="control-group">
-        <label>Brightness</label>
-        <div class="range-row">
-          <input type="range" id="brightness" min="-100" max="100" value="0">
-          <span class="range-value" data-for="brightness">0</span>
-        </div>
-      </div>
-      <div class="control-group">
-        <label>Contrast</label>
-        <div class="range-row">
-          <input type="range" id="contrast" min="-100" max="100" value="0">
-          <span class="range-value" data-for="contrast">0</span>
-        </div>
-      </div>
-      <div class="control-group">
-        <label>Diversity</label>
-        <div class="range-row">
-          <input type="range" id="diversity" min="0" max="100" value="50">
-          <span class="range-value" data-for="diversity">50</span>
-        </div>
-      </div>
-      <div class="control-group">
-        <label>Simplification</label>
-        <div class="range-row">
-          <input type="range" id="simplification" min="0" max="100" value="0">
-          <span class="range-value" data-for="simplification">0</span>
-        </div>
-      </div>
-      <hr class="separator">
-      <div class="btn-row">
-        <button class="btn" id="btn-fullscreen">Fullscreen</button>
-        <button class="btn" id="btn-save">Save PNG</button>
-      </div>
-    </aside>
-    <div class="tool-canvas-area">
-      <canvas id="canvas"></canvas>
-      <button class="fullscreen-exit" id="btn-exit-fs">Exit Fullscreen &middot; Esc</button>
-    </div>
-  </div>
   <script type="module" src="shapes.js"></script>
 </body>
 </html>

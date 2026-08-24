@@ -92,25 +92,6 @@ const effects = {
     }
   },
 
-  shapes: {
-    draw(ctx, f) {
-      ctx.fillStyle = '#0a0a0a';
-      ctx.fillRect(0, 0, W, H);
-      const cols = 12, rows = 8;
-      const cw = W / cols, ch = H / rows, t = f * 0.03;
-      for (let y = 0; y < rows; y++) {
-        for (let x = 0; x < cols; x++) {
-          const v = (Math.sin(x * 0.8 + t) * Math.cos(y * 0.6 + t * 0.7) + 1) / 2;
-          const r = v * cw * 0.42;
-          const b = 100 + v * 155 | 0;
-          ctx.fillStyle = `rgb(${b * 0.65 | 0},${b * 0.78 | 0},${b})`;
-          ctx.beginPath();
-          ctx.arc(x * cw + cw / 2, y * ch + ch / 2, r, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-    }
-  },
 
   text: {
     init() {

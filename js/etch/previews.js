@@ -7,6 +7,40 @@ const W = 180, H = 120;
 const effects = {
   // FIELD: a procedural field sampled through a log-polar (droste) lens — the
   // real pipeline in miniature, rendered into a small ImageData and scaled up.
+  // SHAPES: a luminance ramp resolved through seven tone slots — a different
+  // shape AND colour per bucket, which is the whole point of the tool.
+  shapes: {
+    draw(ctx, f) {
+      const cols = 16, rows = 11;
+      const cw = W / cols, chh = H / rows;
+      const cols7 = ['#12131a', '#33374d', '#5a5f7d', '#8388a6', '#adb2c9', '#d2d6e6', '#f2f4fb'];
+      const kinds = ['circle', 'diamond', 'square', 'hexagon', 'triangle', 'ring', 'cross'];
+      ctx.fillStyle = '#0b0b0f'; ctx.fillRect(0, 0, W, H);
+      const t = f * 0.012;
+      for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < cols; x++) {
+          // a drifting diagonal ramp so every slot is on screen and moving
+          let v = (x / cols) * 0.62 + (1 - y / rows) * 0.38 + Math.sin(t + x * 0.3 + y * 0.2) * 0.1;
+          v = Math.max(0, Math.min(0.999, v));
+          const k = Math.floor(v * 7);
+          const r = Math.min(cw, chh) * 0.5 * (0.34 + 0.66 * v);
+          const cx = x * cw + cw / 2, cy = y * chh + chh / 2;
+          ctx.fillStyle = cols7[k];
+          ctx.strokeStyle = cols7[k];
+          ctx.beginPath();
+          const kind = kinds[k];
+          if (kind === 'circle') ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          else if (kind === 'square') ctx.rect(cx - r, cy - r, r * 2, r * 2);
+          else if (kind === 'diamond') { ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r, cy); ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r, cy); ctx.closePath(); }
+          else if (kind === 'triangle') { ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r * 0.87, cy + r * 0.5); ctx.lineTo(cx - r * 0.87, cy + r * 0.5); ctx.closePath(); }
+          else if (kind === 'hexagon') { for (let i = 0; i < 6; i++) { const a = Math.PI / 3 * i - Math.PI / 6; ctx[i ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * r, cy + Math.sin(a) * r); } ctx.closePath(); }
+          else if (kind === 'ring') { ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.moveTo(cx + r * 0.5, cy); ctx.arc(cx, cy, r * 0.5, 0, Math.PI * 2, true); }
+          else { const w = r * 0.34; ctx.rect(cx - w, cy - r, w * 2, r * 2); ctx.rect(cx - r, cy - w, r * 2, w * 2); }
+          ctx.fill();
+        }
+      }
+    },
+  },
   // TERMNL: a miniature character grid — a rotating torus resolved to glyphs,
   // the tool's own pipeline at preview scale.
   termnl: {
