@@ -21,7 +21,7 @@ const map = (v, a, b, c, d) => c + (d - c) * ((v - a) / (b - a));
 const radians = (deg) => (deg * PI) / 180;
 
 /////////////////////////////////////////////////////////////////////////////
-// State — shaped like the reference. Coords live in image space.
+// State. Coords live in image space.
 /////////////////////////////////////////////////////////////////////////////
 const cnv = {
   source: true, result: true, cursor: true,
@@ -286,7 +286,7 @@ function clipAreaBuffer() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Live preview rendering (port of drawPreview / drawPreviewGraphics)
+// Live preview rendering
 /////////////////////////////////////////////////////////////////////////////
 function drawPreviewBuf() {
   if (!gPreview) return;

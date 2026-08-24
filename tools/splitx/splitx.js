@@ -47,7 +47,7 @@ const ORDER_OPTS = { Forward: 'forward', Backward: 'backward', Equal: 'equal' };
 // Shape library — authored here (original art), each as one or more closed
 // polylines in a 0..360 box centred on (180,180); the same geometry yields a
 // Path2D (canvas) and an SVG `d` string (Paper export). A stamp is centred by
-// translating (-180,-180), matching the reference's shape origin.
+// translating (-180,-180) — i.e. by SHAPE_HALF on each axis.
 /////////////////////////////////////////////////////////////////////////////
 const SHAPE_HALF = 180;
 const C = 180, R = 180;
@@ -88,7 +88,7 @@ function refreshShape() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// State (faithful defaults; preset names & palettes are original)
+// State — the default parameter tree
 /////////////////////////////////////////////////////////////////////////////
 const cnv = {
   ratio: '1:1', animation: true, frame: 0,
@@ -185,7 +185,7 @@ function getColorValue(i) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Per-stamp parameter generation (port of generateParameters / get*Value).
+// Per-stamp parameter generation.
 // frame is normalised [0,1) across the loop period (length·frameRate).
 /////////////////////////////////////////////////////////////////////////////
 let GW = 480, GH = 480;
@@ -368,8 +368,8 @@ function drawSplitImages(p, gForm, gDraw) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// SVG export — reconstruct the same formData with Paper.js (faithful XOR
-// compound paths + split clip layers), exactly as the reference svg.js does.
+// SVG export — reconstruct the same formData with Paper.js: XOR compound paths
+// + split clip layers, so the vector output matches the canvas render.
 /////////////////////////////////////////////////////////////////////////////
 let paperReady = false;
 function renderSVG() {
@@ -549,8 +549,8 @@ tool.canvasHost.addEventListener('drop', (e) => {
 });
 
 /////////////////////////////////////////////////////////////////////////////
-// UI — mirrors the reference folder structure (CANVAS / SHAPE / COLOR /
-// TRANSFORM + a SCALE / X MOVE / Y MOVE / ROTATE motion tab).
+// UI folders: CANVAS / SHAPE / COLOR / TRANSFORM, plus a SCALE / X MOVE /
+// Y MOVE / ROTATE motion tab.
 /////////////////////////////////////////////////////////////////////////////
 const main = tool.pages.main;
 

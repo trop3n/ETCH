@@ -17,7 +17,7 @@ import { attachExport } from '../../js/etch/export.js';
 import { seedNoise, noise3D, noise4D } from '../../js/etch/noise.js';
 
 /////////////////////////////////////////////////////////////////////////////
-// Math + easing (port of map2.js — easing-aware map())
+// Math + easing — an easing-aware map()
 /////////////////////////////////////////////////////////////////////////////
 const { sin, cos, atan2, sqrt, abs, round, floor, min, max, pow, PI } = Math;
 const TWO_PI = PI * 2;
@@ -117,7 +117,7 @@ const FONT_OPTS = Object.fromEntries(Object.keys(FONTS).map((k) => [k, k]));
 const CHAR_FONT_OPTS = { ...FONT_OPTS, 'Use Prompt Font': 'inherit' };
 
 /////////////////////////////////////////////////////////////////////////////
-// State (faithful taxonomy + defaults; preset names / palettes / fonts original)
+// State — the default parameter tree
 /////////////////////////////////////////////////////////////////////////////
 const cnv = { offset: 2048, frame: 0, ratio: '1:1', scale: 1, rotate: 0, bg: '#0e0f17ff', animation: false };
 const prompt = { font: 'Anton', text: 'RAS\nTR', align: 'CENTER', size: 46, leading: 1, spacing: 0, offset: { x: 0, y: 0 } };
@@ -363,7 +363,7 @@ class Particle {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Derived sizes (recomputed each frame, like the reference's drawGraphics head)
+// Derived sizes — recomputed each frame, before anything is drawn
 /////////////////////////////////////////////////////////////////////////////
 function computeCharBounds() {
   if (form.type !== 'text' || !FONT) return;
@@ -458,7 +458,7 @@ function drawGraphics() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// SVG export (port of svg.js — manual element string building)
+// SVG export — manual element string building
 /////////////////////////////////////////////////////////////////////////////
 function renderSVG() {
   if (!particles.length) return '';

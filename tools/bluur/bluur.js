@@ -21,8 +21,8 @@ const map = (v, a, b, c, d) => c + (d - c) * ((v - a) / (b - a));
 const constrain = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
 const round = (v, d = 0) => { const p = 10 ** d; return Math.round(v * p) / p; };
 
-// Eased remap (port of the reference's map2 / sighack easing) — only the curves
-// the engine actually uses: Linear / Quadratic / Cubic / Sqrt / Quintic /
+// Eased remap — sighack's map2 easing (MIT), trimmed to the curves this engine
+// actually uses: Linear / Quadratic / Cubic / Sqrt / Quintic /
 // Sinusoidal / Circular, with IN(0)/OUT(1)/BOTH(2).
 function map2(value, s1, e1, s2, e2, type, when) {
   const b = s2, c = e2 - s2, d = e1 - s1, p = 0.5;
@@ -88,8 +88,8 @@ const PALETTE_OPTS = { Procedural: 'generative', Custom: 'custom' };
 const BG_OPTS = { 'From Palette': 'random', Custom: 'custom' };
 
 /////////////////////////////////////////////////////////////////////////////
-// State — shaped like the reference (cnv / form / post / palette / rec / svg) so
-// reference-style preset objects deep-merge directly. Faithful numeric defaults.
+// State — grouped as cnv / form / post / palette / rec / svg so preset objects
+// deep-merge directly.
 /////////////////////////////////////////////////////////////////////////////
 const cnv = {
   ratio: '1:1', blend: 'SOFT_LIGHT', animation: true, frame: 0,
@@ -423,8 +423,9 @@ function updateCanvas() {
 
 function postFilter() {
   const r = post.blur.radius;
-  // map the reference's radius (downscaled-buffer gaussian) to an equivalent
-  // CSS blur in render-space px; contrast maps 1:1, brightness ~additively.
+  // blur.radius is expressed in downscaled-buffer gaussian units; convert it to
+  // an equivalent CSS blur in render-space px. Contrast maps 1:1, brightness
+  // roughly additively.
   const blurPx = r <= 0 ? 0 : (r + r * r * 0.18) * (GW / 480) * 2;
   const parts = [];
   if (blurPx > 0) parts.push(`blur(${blurPx}px)`);
@@ -514,8 +515,8 @@ tool.canvasHost.addEventListener('drop', (e) => {
 });
 
 /////////////////////////////////////////////////////////////////////////////
-// UI — mirrors the reference folder structure (CANVAS / FORM + a form-property
-// tab NUM/SIZE/OFF/ANG/BLUR/COL + PALETTE + POST).
+// UI folders: CANVAS / FORM, plus a form-property tab
+// NUM/SIZE/OFF/ANG/BLUR/COL, then PALETTE and POST.
 /////////////////////////////////////////////////////////////////////////////
 const main = tool.pages.main;
 
@@ -618,7 +619,7 @@ function sizeUI() {
 function angleUI() { angleRand.hidden = form.angle.mode !== 'random'; }
 
 /////////////////////////////////////////////////////////////////////////////
-// Randomizers (port of random.js, eased the same way)
+// Randomizers (eased through map2, the same way the engine is)
 /////////////////////////////////////////////////////////////////////////////
 const rmax = cnv.seed.max;
 const R = Math.random;
@@ -678,7 +679,7 @@ function randomParams() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Presets (original names + palettes; numeric configs in the reference's taxonomy)
+// Presets
 /////////////////////////////////////////////////////////////////////////////
 const presets = {
   'Prism Stacks': {

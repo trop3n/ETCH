@@ -19,7 +19,7 @@ const map = (v, a, b, c, d) => c + (d - c) * ((v - a) / (b - a));
 const radians = (deg) => (deg * PI) / 180;
 
 /////////////////////////////////////////////////////////////////////////////
-// State — shaped like the reference so preset objects deep-merge cleanly.
+// State — one nested object tree, so preset objects deep-merge cleanly.
 // Colours are { r, g, b } (0..255), matching the engine maths + Tweakpane's
 // auto-detected RGB color input.
 /////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,8 @@ let frame = 0;
 const fd = {};
 
 function makeForm() {
-  // call order matches the reference Form() so a given seed reproduces it
+  // P.random() call order is load-bearing: reorder these and a given seed
+  // stops reproducing the same form
   return {
     xoff: { x: P.random(-PI, PI), y: P.random(-PI, PI) },
     yoff: { x: P.random(-PI, PI), y: P.random(-PI, PI) },
@@ -80,7 +81,7 @@ function createForms() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Per-frame derived values (port of drawGraphics) + form orbit (port of coords)
+// Per-frame derived values + form orbit
 /////////////////////////////////////////////////////////////////////////////
 function computeFrameData() {
   frame = cnv.frame / (rec.length.value * rec.frameRate);
@@ -113,7 +114,7 @@ function orbit(f) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Render (port of drawForms)
+// Render
 /////////////////////////////////////////////////////////////////////////////
 function drawStamp(f, size, posx, posy) {
   P.push();
@@ -282,7 +283,7 @@ fSeed.addButton({ title: 'New Seed' }).on('click', () => { form.seed = Math.floo
 
 // Note: form.bg holds { type, r, g, b }; Tweakpane binds the whole object, so the
 // 'Back Color' picker shows alongside 'type' but only the r/g/b are read for the
-// custom background. This mirrors the reference's single bg object.
+// custom background. Keeping bg as one object keeps preset merging a single step.
 function formUI() { fRot.disabled = form.type === 'ellipse'; }
 function bgUI() {
   const custom = form.bg.type === 'custom';
@@ -382,7 +383,7 @@ opts.addBinding(rec.length, 'value', { label: 'Loop Length', min: rec.length.min
 opts.addButton({ title: 'Fullscreen (f)' }).on('click', () => tool.toggleFullscreen());
 
 /////////////////////////////////////////////////////////////////////////////
-// Randomizer (port of randomParams; poster/branding fields omitted)
+// Randomizer
 /////////////////////////////////////////////////////////////////////////////
 function randomize() {
   const R = (a, b) => (b === undefined ? Math.random() * a : a + Math.random() * (b - a));

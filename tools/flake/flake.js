@@ -23,7 +23,7 @@ const dist = (x0, y0, x1, y1) => Math.hypot(x1 - x0, y1 - y0);
 const round2 = (v, n = 0) => { const f = 10 ** n; return Math.round(v * f) / f; };
 
 /////////////////////////////////////////////////////////////////////////////
-// Easing (standard Penner set, keyed by label like the reference)
+// Easing — the standard Penner set, keyed by the label strings params store
 /////////////////////////////////////////////////////////////////////////////
 const EASE = {
   none: (t) => t, Linear: (t) => t,
@@ -124,7 +124,7 @@ function refreshShape() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// State (faithful defaults; preset NAMES & palettes are original)
+// State — the default parameter tree
 /////////////////////////////////////////////////////////////////////////////
 const seed = { value: 0, max: 100000 };
 const cnv = { scale: 0.9, ratio: '1:1', animation: false, frame: 0, bg: { mode: 'custom', custom: '#FFFFFF' } };
@@ -175,7 +175,7 @@ function rebuildPalette() {
 function reseedNoise() { seedNoise(seed.value); }
 
 /////////////////////////////////////////////////////////////////////////////
-// Per-point precompute (port of generateFrameData): everything that doesn't
+// Per-point precompute: everything that doesn't
 // change across animation frames. `frame` then only advances the noise sample.
 /////////////////////////////////////////////////////////////////////////////
 let frameData = {};
@@ -337,7 +337,7 @@ function generateFrameData(p) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Render (port of drawForms): stamp every point onto the transparent buffer.
+// Render: stamp every point onto the transparent buffer.
 /////////////////////////////////////////////////////////////////////////////
 function drawForms(p, g) {
   const fd = frameData; if (!fd.count) return;
@@ -716,7 +716,7 @@ function deepMerge(dst, src) {
   }
 }
 
-// Minimal preset dropdown on OPTIONS (a faithful, original-named starter set).
+// Minimal preset dropdown on OPTIONS (a small starter set).
 const presetState = { name: 'Cobalt Bloom' };
 const opts = tool.pages.options;
 opts.addBinding(presetState, 'name', { label: 'Preset', options: Object.fromEntries(Object.keys(presets).map((k) => [k, k])) }).on('change', (ev) => applyPreset(ev.value));

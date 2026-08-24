@@ -70,7 +70,7 @@ function map2(value, s1, e1, s2, e2, type, when) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// State — shaped like the reference (a few branding/poster fields trimmed)
+// State — the default parameter tree
 /////////////////////////////////////////////////////////////////////////////
 const params = { easing: 0.06, frame: 0, mouseDown: false, bg: '#1a1a1f' };
 const cnv = { width: 0, height: 0, density: 1, showSource: true, showResult: true };
@@ -325,7 +325,7 @@ function rotationMode() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// maap — mouse-drag pan (port of maapUse). Operates in image-space coords.
+// maap — mouse-drag pan. Operates in image-space coords.
 /////////////////////////////////////////////////////////////////////////////
 function maapUse() {
   if (leftDown && overCanvas) {

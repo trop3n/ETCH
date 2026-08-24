@@ -21,7 +21,7 @@ const radians = (deg) => (deg * PI) / 180;
 const newNoise = () => createNoise2D(alea((Math.random() * 1e9) | 0));
 
 /////////////////////////////////////////////////////////////////////////////
-// State — shaped like the reference so preset objects deep-merge cleanly.
+// State — one nested object tree, so preset objects deep-merge cleanly.
 /////////////////////////////////////////////////////////////////////////////
 const cnv = {
   show: true,
@@ -65,7 +65,7 @@ const anim = {
   opacity: { type: 'none', level: 75, rate: 3 },
   tint: { type: 'none', level: 25, color: '#FFFFFF', rate: 4 },
 };
-// Re-map tables (port of `mapping`): map UI ranges → engine magnitudes.
+// Re-map tables: map UI ranges → engine magnitudes.
 const mapping = {
   move: { level: { min: 0.01, max: 1 }, rate: { const: { min: 0.4, max: 12 }, noise: { min: 0.01, max: 0.25 }, geom: { min: 1, max: 10 } } },
   offset: { level: { min: 0.01, max: 0.25 }, rate: { noise: { min: 0.01, max: 0.15 }, geom: { min: 1, max: 10 } } },
@@ -102,7 +102,7 @@ function rgbaToHex({ r, g, b, a = 1 }) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Trend helper (port of getTrend/toggleTrend)
+// Trend helper
 /////////////////////////////////////////////////////////////////////////////
 function getTrend(ch) {
   const t = ch.trend ? ch.trend.type : 'random';
@@ -116,7 +116,7 @@ function getTrend(ch) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Form — one drifting image fragment (port of the Form class)
+// Form — one drifting image fragment
 /////////////////////////////////////////////////////////////////////////////
 class Form {
   constructor(isRandom) {
@@ -664,7 +664,7 @@ function applyPreset(name) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Randomizer (port of randomParameters)
+// Randomizer
 /////////////////////////////////////////////////////////////////////////////
 function randomize() {
   const R = (a, b) => (b === undefined ? Math.random() * a : a + Math.random() * (b - a));
@@ -716,7 +716,7 @@ opts.addButton({ title: 'Pause / Resume (P)' }).on('click', () => { form.run = !
 opts.addButton({ title: 'New Default Image' }).on('click', () => { setImage(makeDefaultImage()); addRandomFormsOnStartup(); });
 opts.addButton({ title: 'Fullscreen (f)' }).on('click', () => tool.toggleFullscreen());
 
-// Keyboard shortcuts (mirror the reference)
+// Keyboard shortcuts
 window.addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
   switch (e.code) {

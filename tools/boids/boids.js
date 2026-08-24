@@ -66,7 +66,7 @@ const SHAPE_OPTS = { Mixed: 'mixed', Ellipse: 'ellipse', Rectangle: 'rect', Tria
 const SHAPE_KEYS = ['ellipse', 'rect', 'triangle'];
 
 /////////////////////////////////////////////////////////////////////////////
-// State (faithful defaults; preset names & palettes are original)
+// State — the default parameter tree
 /////////////////////////////////////////////////////////////////////////////
 const cnv = {
   ratio: '1:1', animation: true,
@@ -96,7 +96,7 @@ const params = {
 };
 const DEFAULTS = structuredClone({ cnv, params });
 
-// Runtime globals (derived in syncGlobals; mirrors the reference `g`).
+// Runtime globals — derived in syncGlobals().
 const g = {
   frame: 0, defaultSize: 10, gridFactor: 500,
   shapeTypes: [], shapePos: [], shapeVelocity: [], shapeScale: [], shapeColor: [],
@@ -327,7 +327,7 @@ class Flock {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Derived globals (port of syncGlobals) + seeded random arrays
+// Derived globals + seeded random arrays
 /////////////////////////////////////////////////////////////////////////////
 function syncGlobals() {
   g.delta = 1;
@@ -505,8 +505,7 @@ tool.canvasHost.addEventListener('drop', (e) => {
 });
 
 /////////////////////////////////////////////////////////////////////////////
-// UI — mirrors the reference folder structure (CANVAS / SHAPE / COLOR /
-// FLOCKING / SIMULATION).
+// UI folders: CANVAS / SHAPE / COLOR / FLOCKING / SIMULATION.
 /////////////////////////////////////////////////////////////////////////////
 const main = tool.pages.main;
 

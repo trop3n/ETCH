@@ -14,7 +14,7 @@ import { createNoise2D, createNoise4D } from '../../js/vendor/simplex/simplex-no
 import { loadFont, parseFont, FONT_OPTIONS } from '../../js/etch/typography.js';
 
 /////////////////////////////////////////////////////////////////////////////
-// Math + easing (port of ease.js — referenced by name from params)
+// Math + easing — curves referenced by name from params
 /////////////////////////////////////////////////////////////////////////////
 const { sin, cos, abs, floor, ceil, min, max, sqrt, pow, PI } = Math;
 const TWO_PI = PI * 2, HALF_PI = PI / 2;
@@ -70,7 +70,7 @@ const AMP_OPTS = { 'Easing Off': 'uniform', 'From Center': 'center', 'From Edges
 const EASE_OPTS = { Linear: 'linear', 'Sine In': 'easeInSine', 'Sine Out': 'easeOutSine', 'Sine In/Out': 'easeInOutSine', 'Quad In': 'easeInQuad', 'Quad Out': 'easeOutQuad', 'Quad In/Out': 'easeInOutQuad', 'Cubic In': 'easeInCubic', 'Cubic Out': 'easeOutCubic', 'Cubic In/Out': 'easeInOutCubic', 'Expo In': 'easeInExpo', 'Expo Out': 'easeOutExpo', 'Circ In': 'easeInCirc', 'Circ Out': 'easeOutCirc', 'Back In': 'easeInBack', 'Back Out': 'easeOutBack', 'Elastic In': 'easeInElastic', 'Elastic Out': 'easeOutElastic', 'Bounce In': 'easeInBounce', 'Bounce Out': 'easeOutBounce' };
 
 /////////////////////////////////////////////////////////////////////////////
-// State (faithful defaults; preset names + fonts are original)
+// State — the default parameter tree
 /////////////////////////////////////////////////////////////////////////////
 const cnv = { ratio: '1:1', scale: 1, frame: 0, maxFrames: 900, animation: true, seed: (Math.random() * 1000) | 0, bg: { mode: 'fill', fill: '#000000' } };
 const params = {
@@ -137,7 +137,7 @@ function getTextBounds() {
   textr.words = []; textr.width = 0; textr.height = 0;
   const wSpace = params.layout === 'vertical' ? params.collision.offset : 0;
   const hSpace = params.layout === 'horizontal' ? params.collision.offset : 0;
-  // font letter-spacing → row/copy interval (px), per the reference formula
+  // font letter-spacing → row/copy interval (px)
   textr.interval = params.size.font * (params.interval * 10) / 1000;
 
   let units;

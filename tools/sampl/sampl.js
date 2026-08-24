@@ -51,7 +51,7 @@ const CASE_OPTS = { Uppercase: 'uppercase', Lowercase: 'lowercase' };
 const IMG_ARRANGE_OPTS = { 'Sample Sequence': 'sample', 'Glyph Sequence': 'glyph' };
 
 /////////////////////////////////////////////////////////////////////////////
-// State (faithful defaults; preset names + palettes are original)
+// State — the default parameter tree
 /////////////////////////////////////////////////////////////////////////////
 const cnv = { ratio: '4:3', seed: 0, frame: 0, animation: true, color: { mode: 'custom', custom: '#0d0d0d' } };
 const params = {
@@ -89,8 +89,8 @@ const rec = { frameRate: 60, length: { value: 10, min: 1, max: 60 } };
 const DEFAULTS = structuredClone({ cnv, params, sample, palette });
 
 /////////////////////////////////////////////////////////////////////////////
-// Seeded simplex — ONE noise field (like the reference's simplex.base), with the
-// per-channel seeds folded into the sample coordinate.
+// Seeded simplex — ONE shared noise field, with the per-channel seeds folded
+// into the sample coordinate.
 /////////////////////////////////////////////////////////////////////////////
 let noise3D;
 function seedEvent() { noise3D = createNoise3D(alea(cnv.seed)); }
@@ -243,7 +243,7 @@ function wrapText() {
 
 /////////////////////////////////////////////////////////////////////////////
 // Sampling — walk each glyph outline with Paper.js and distribute points by
-// arc length (synchronous port of the reference's worker.js).
+// arc length. Runs synchronously on the shared Paper.js scope.
 /////////////////////////////////////////////////////////////////////////////
 function distributePointsOnPath(path, numPoints) {
   const pts = [];
@@ -298,8 +298,8 @@ function sampleGlyphs() {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// Frame object — derive per-render numbers from params/sample/palette (port of
-// frame.js). Rebuilt on any control change.
+// Frame object — derive per-render numbers from params/sample/palette.
+// Rebuilt on any control change.
 /////////////////////////////////////////////////////////////////////////////
 let F = null;
 
@@ -647,7 +647,7 @@ tool.startSketch((p) => {
 });
 
 /////////////////////////////////////////////////////////////////////////////
-// SVG export — reconstruct the field with Paper.js (port of svg.js).
+// SVG export — reconstruct the field with Paper.js.
 /////////////////////////////////////////////////////////////////////////////
 function renderSVG() {
   const paper = window.paper;
