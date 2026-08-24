@@ -7,6 +7,49 @@ const W = 180, H = 120;
 const effects = {
   // FIELD: a procedural field sampled through a log-polar (droste) lens — the
   // real pipeline in miniature, rendered into a small ImageData and scaled up.
+  // TERMNL: a miniature character grid — a rotating torus resolved to glyphs,
+  // the tool's own pipeline at preview scale.
+  termnl: {
+    init() { return { f: 0 }; },
+    draw(ctx, f) {
+      const cell = 6, cw = cell * 0.6;
+      const cols = Math.floor(W / cw), rows = Math.floor(H / cell);
+      const ramp = ' .:-=+*#%@';
+      ctx.fillStyle = '#03120a'; ctx.fillRect(0, 0, W, H);
+      ctx.font = `${cell}px 'IBM Plex Mono', monospace`;
+      ctx.textBaseline = 'top';
+      const t = f * 0.03;
+      const ca = Math.cos(t * 0.9), sa = Math.sin(t * 0.9);
+      const cb = Math.cos(t * 0.62), sb = Math.sin(t * 0.62);
+      const z = new Float32Array(cols * rows), v = new Float32Array(cols * rows);
+      const R = 1, r = 0.42, scale = Math.min(cols / 2, rows) * 1.32;
+      for (let i = 0; i < 6000; i++) {
+        const u = (i % 120) / 120 * Math.PI * 2, w = Math.floor(i / 120) / 50 * Math.PI * 2;
+        const cu = Math.cos(u), su = Math.sin(u), cv = Math.cos(w), sv = Math.sin(w);
+        const px = (R + r * cv) * cu, py = (R + r * cv) * su, pz = r * sv;
+        const y1 = py * ca - pz * sa, z1 = py * sa + pz * ca;
+        const x2 = px * cb - y1 * sb, y2 = px * sb + y1 * cb;
+        const ny1 = (cv * su) * ca - sv * sa, nz1 = (cv * su) * sa + sv * ca;
+        const nx2 = (cv * cu) * cb - ny1 * sb, ny2 = (cv * cu) * sb + ny1 * cb;
+        const zz = z1 + 4.2; if (zz <= 0.05) continue;
+        const ooz = 1 / zz;
+        const sx = Math.round(cols / 2 + scale * x2 * ooz * 2);
+        const sy = Math.round(rows / 2 - scale * y2 * ooz);
+        if (sx < 0 || sx >= cols || sy < 0 || sy >= rows) continue;
+        const k = sy * cols + sx;
+        if (ooz <= z[k]) continue;
+        z[k] = ooz;
+        v[k] = Math.max(0.06, Math.min(1, (ny2 * 0.7071 - nz1 * 0.7071 + 0.55) * 0.78));
+      }
+      for (let y = 0; y < rows; y++) {
+        let run = '';
+        for (let x = 0; x < cols; x++) run += ramp[Math.round(v[y * cols + x] * 9)];
+        const g = 90 + Math.round(120 * (1 - y / rows));
+        ctx.fillStyle = `rgb(60,${g + 60},90)`;
+        ctx.fillText(run, 0, y * cell);
+      }
+    },
+  },
   field: {
     init() { return { buf: null }; },
     draw(ctx, f, st) {

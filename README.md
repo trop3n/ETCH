@@ -13,7 +13,7 @@ python3 -m http.server 8000
 ```
 
 Then open `http://localhost:8000/` — the **Etch stack** (the current
-focus, 17 tools) plus the **Classic** raster tools (12 earlier experiments), all
+focus, 18 tools) plus the **Classic** raster tools (12 earlier experiments), all
 on one page. Or navigate directly to `tools/<name>/`.
 
 > After editing a shared module under `js/etch/`, hard-refresh (Ctrl/Cmd+Shift+R)
@@ -22,7 +22,7 @@ on one page. Or navigate directly to `tools/<name>/`.
 
 ## The tools
 
-### Etch stack (17)
+### Etch stack (18)
 
 | Tool | What it does |
 |---|---|
@@ -42,6 +42,7 @@ on one page. Or navigate directly to `tools/<name>/`.
 | **SKAAAN** | Scan-line displacement glitch — shift / scale / rotate / noise an image as a line sweeps it |
 | **STIIL** | Abstract graphics from images via stacked artistic effects |
 | **BOIDS** | Flocking simulation with shape, skew & velocity color |
+| **TERMNL** | Text-native generative terminal — 12 character engines, 4 modes, .txt/.ans export |
 | **FIELD** | 24 procedural field engines mapped through conformal lenses, layered, re-lit & screened |
 
 ### Classic (12)
