@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Etch is a collection of browser-based visual/creative tools. There is **no build system, bundler, or transpiler** — files are served as-is. Two families of tools live side by side:
 
-1. **Etch-stack tools** (the current focus) — a recreation/homage of the antlii.work generative toolset (artist Anatolii Babii), built on **p5.js + Tweakpane + Paper.js + opentype.js**, with a shared shell in `js/etch/`. 16 tools.
+1. **Etch-stack tools** (the current focus) — a recreation/homage of the antlii.work generative toolset (artist Anatolii Babii), built on **p5.js + Tweakpane + Paper.js + opentype.js**, with a shared shell in `js/etch/`. 17 tools.
 2. **Legacy raster tools** — the original vanilla-Canvas/WebGL tools, untouched. 12 tools (the four superseded by Etch-stack recreations — flake, refract, boids, rhythm — were deleted). Intentionally preserved.
 
 The root `index.html` is the single landing page: the Etch grid plus a Classic Tools section listing the legacy tools.
@@ -57,7 +57,7 @@ Each tool is `tools/<name>/index.html` + `tools/<name>/<name>.js`. The HTML load
 ### Per-type tool pattern
 - **Raster** (RITM): `startSketch` 2D; draw each frame from `params`.
 - **Vector** (SPLITX, FLAKE): `const canvas = mountCanvas(); paper.setup(canvas); paper.view.onFrame = ...`; SVG export via `() => paper.project.exportSVG({ asString: true })`.
-- **Shader** (REFRACT, BLUUR): `startSketch` with `createCanvas(w,h,p.WEBGL)` + `setAttributes('preserveDrawingBuffer', true)` + `createShader(VERT, FRAG)` + fullscreen `rect`.
+- **Shader** (REFRACT, BLUUR, FIELD): `startSketch` with `createCanvas(w,h,p.WEBGL)` + `setAttributes('preserveDrawingBuffer', true)` + `createShader(VERT, FRAG)` + fullscreen `rect`.
 - **3D** (PLAIN): p5 WEBGL custom mesh with per-face normals + lighting.
 - **Typography** (TEXTR, SAMPL, RASTR): `typography.js` → glyph path data → Paper `importSVG` / sampling.
 - **Image-manip** (SKAAAN, DRIFT, KLON, STIIL): p5 2D + pointer listeners on `tool.canvasHost` (the floating pane sits above it, so it never triggers canvas interactions) + image drag-drop.
@@ -88,7 +88,7 @@ Single stylesheet for everything. CSS variables (`:root`): `--bg`, `--surface`, 
 
 ## Tools
 
-**Etch stack (16):** FLAKE `flake`, SPLITX `splitx`, BLUUR `bluur`, TEXTR `textr`, SAMPL `sampl`, RASTR `rastr`, RITM `ritm`, REFRACT `refract`, DITHR `dithr`, PLAIN `plain`, BIOM `biom`, DRIFT `drift`, KLON `klon`, SKAAAN `skaaan`, STIIL `stiil`, BOIDS `boids`.
+**Etch stack (17):** FLAKE `flake`, SPLITX `splitx`, BLUUR `bluur`, TEXTR `textr`, SAMPL `sampl`, RASTR `rastr`, RITM `ritm`, REFRACT `refract`, DITHR `dithr`, PLAIN `plain`, BIOM `biom`, DRIFT `drift`, KLON `klon`, SKAAAN `skaaan`, STIIL `stiil`, BOIDS `boids`, FIELD `field`.
 
 **Legacy (12):** blob-tracker, cellular-automata, dithering, flipdigits, gradient-map, mesher, pixel-flow, pixelator, shapes, srt2video, text, video2midi.
 

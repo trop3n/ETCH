@@ -5,6 +5,41 @@
 const W = 180, H = 120;
 
 const effects = {
+  // FIELD: a procedural field sampled through a log-polar (droste) lens — the
+  // real pipeline in miniature, rendered into a small ImageData and scaled up.
+  field: {
+    init() { return { buf: null }; },
+    draw(ctx, f, st) {
+      const bw = 90, bh = 60;
+      if (!st.buf) st.buf = ctx.createImageData(bw, bh);
+      const d = st.buf.data;
+      const stops = [[15, 6, 3], [74, 28, 8], [184, 100, 28], [251, 227, 188]];
+      const t = f * 0.02;
+      const cx = bw / 2, cy = bh / 2;
+      for (let y = 0; y < bh; y++) {
+        for (let x = 0; x < bw; x++) {
+          const dx = (x - cx) / bh, dy = (y - cy) / bh;
+          const r = Math.max(Math.hypot(dx, dy), 1e-3);
+          const a = Math.atan2(dy, dx);
+          const lr = Math.log(r);
+          const u = lr * 2.4 + a * 0.8 + t;
+          const v = a * 3.0 + lr * 0.7 - t * 0.7;
+          let g = (Math.sin(u * 2.0) * 0.5 + 0.5) * 0.6 + (Math.sin(v * 2.0) * 0.5 + 0.5) * 0.4;
+          g = g * g * (3 - 2 * g);
+          const s = g * 3, i0 = Math.min(2, s | 0), ft = s - i0;
+          const A = stops[i0], B = stops[i0 + 1];
+          const o = (y * bw + x) * 4;
+          d[o] = A[0] + (B[0] - A[0]) * ft;
+          d[o + 1] = A[1] + (B[1] - A[1]) * ft;
+          d[o + 2] = A[2] + (B[2] - A[2]) * ft;
+          d[o + 3] = 255;
+        }
+      }
+      ctx.putImageData(st.buf, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(ctx.canvas, 0, 0, bw, bh, 0, 0, W, H);
+    },
+  },
   ritm: {
     draw(ctx, f) {
       ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, W, H);

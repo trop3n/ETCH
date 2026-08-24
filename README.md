@@ -13,7 +13,7 @@ python3 -m http.server 8000
 ```
 
 Then open `http://localhost:8000/` — the **Etch stack** (the current
-focus, 16 tools) plus the **Classic** raster tools (12 earlier experiments), all
+focus, 17 tools) plus the **Classic** raster tools (12 earlier experiments), all
 on one page. Or navigate directly to `tools/<name>/`.
 
 > After editing a shared module under `js/etch/`, hard-refresh (Ctrl/Cmd+Shift+R)
@@ -22,7 +22,7 @@ on one page. Or navigate directly to `tools/<name>/`.
 
 ## The tools
 
-### Etch stack (16)
+### Etch stack (17)
 
 | Tool | What it does |
 |---|---|
@@ -42,6 +42,7 @@ on one page. Or navigate directly to `tools/<name>/`.
 | **SKAAAN** | Scan-line displacement glitch — shift / scale / rotate / noise an image as a line sweeps it |
 | **STIIL** | Abstract graphics from images via stacked artistic effects |
 | **BOIDS** | Flocking simulation with shape, skew & velocity color |
+| **FIELD** | 24 procedural field engines mapped through conformal lenses, layered, re-lit & screened |
 
 ### Classic (12)
 The original vanilla-Canvas/WebGL experiments, in the Classic Tools section of
@@ -93,3 +94,6 @@ Some tools incorporate third-party routines, each attributed inline in its sourc
   humanbydefinition; ported verbatim.
 - **SKAAAN** — easing curves (Penner) via Manohar Vanga / Jeff Thompson's
   [sighack](https://sighack.com/post/easing-functions-in-processing) (MIT).
+- **FIELD** — the fragment shader is ported from `fluid-core` by KrackedDevs
+  ([enonforetsam/fluid](https://github.com/enonforetsam/fluid), MIT) and kept
+  verbatim; palettes, presets and the control surface are original.
