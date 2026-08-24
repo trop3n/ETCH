@@ -1,4 +1,4 @@
-// Vector shape factory for antlii tools. Returns a Paper.js Item centered at the
+// Vector shape factory for Etch tools. Returns a Paper.js Item centered at the
 // origin at the given size (Paper constructors auto-insert into the active layer).
 export const SHAPE_OPTIONS = { Circle: 'circle', Square: 'square', Triangle: 'triangle', Diamond: 'diamond', Star: 'star', Cross: 'cross', Ring: 'ring', Hexagon: 'hexagon' };
 

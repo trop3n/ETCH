@@ -10,14 +10,11 @@
 // p5 canvas; SVG export reconstructs the same field as <rect>/<ellipse>/<polygon>
 // /<path> elements with per-shape linear gradients.
 //
-// A faithful re-implementation (homage) of antlii's RASTR engine — algorithm,
-// parameter taxonomy, defaults and ranges studied from the public
-// antlii.github.io/rastr-tool source. Native text is rendered through a FontFace
-// (matching the reference's family-string rendering); opentype.js supplies the
-// glyph outline for SVG export. Original code, preset names, palettes and fonts.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { seedNoise, noise3D, noise4D } from '../../js/antlii/noise.js';
+// Native text is rendered through a FontFace; opentype.js supplies the glyph
+// outline for SVG export.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
+import { seedNoise, noise3D, noise4D } from '../../js/etch/noise.js';
 
 /////////////////////////////////////////////////////////////////////////////
 // Math + easing (port of map2.js — easing-aware map())
@@ -763,7 +760,7 @@ function applyPreset(name) {
   if (pr.form) deepMerge(form, pr.form);
   if (pr.motion) deepMerge(motion, pr.motion);
   if (pr.rec) deepMerge(rec, pr.rec);
-  // Live antlii presets carry prompt.family + a 'transition' colour mode — bridge them.
+  // External presets may carry prompt.family + a 'transition' colour mode — bridge them.
   if (pr.prompt && pr.prompt.family) prompt.font = FONTS[pr.prompt.family] ? pr.prompt.family : 'Anton';
   if (form.fill.type === 'transition') form.fill.type = 'shuffle';
   if (form.stroke.type === 'transition') form.stroke.type = 'shuffle';

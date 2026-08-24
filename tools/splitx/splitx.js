@@ -1,22 +1,18 @@
 // SPLITX — a single base shape stamped N times into an offscreen buffer, each
 // stamp transformed by sequenced scale + noise/sin move/rotate, then the buffer
 // is kaleidoscopically split-mirrored (none / horizontal / vertical / quad) into
-// the final frame. A faithful re-implementation (homage) of antlii's SPLITX
-// engine: behaviour and parameter model studied from the public
-// antlii.github.io/splitx-tool source; math runs in a fixed render-space (the
-// ratio resolution) so parameter magnitudes match the reference. Live render is
-// p5 + Path2D buffers; SVG export reconstructs the same formData with Paper.js
-// (the only faithful way to bake per-stamp transforms + XOR compound paths).
-// Original code, shape art, preset names and palettes.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { alea } from '../../js/antlii/noise.js';
+// the final frame. Math runs in a fixed render-space (the ratio resolution) so
+// parameter magnitudes stay stable across canvas sizes. Live render is p5 +
+// Path2D buffers; SVG export reconstructs the same formData with Paper.js (the
+// only reliable way to bake per-stamp transforms + XOR compound paths).
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
+import { alea } from '../../js/etch/noise.js';
 import { createNoise3D } from '../../js/vendor/simplex/simplex-noise.js';
-import { interpolateHex, attachPaletteControls } from '../../js/antlii/palette.js';
+import { interpolateHex, attachPaletteControls } from '../../js/etch/palette.js';
 
 /////////////////////////////////////////////////////////////////////////////
-// Math helpers (plain JS so the port reads like the reference; angles in degrees
-// to match the reference's gForm.angleMode(DEGREES))
+// Math helpers (angles in degrees, matching the form buffer's angle mode)
 /////////////////////////////////////////////////////////////////////////////
 const { sin, cos, floor, abs } = Math;
 const TWO_PI = Math.PI * 2;

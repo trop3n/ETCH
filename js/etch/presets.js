@@ -1,4 +1,4 @@
-// Preset system for antlii tools: a named-preset dropdown + Restart + Randomize,
+// Preset system for Etch tools: a named-preset dropdown + Restart + Randomize,
 // plus JSON import/export. Presets and files both operate on the plain `params`
 // object (which Tweakpane bindings mutate directly), so the on-disk format is
 // simply the params JSON. Call pane.refresh() after mutating params externally.

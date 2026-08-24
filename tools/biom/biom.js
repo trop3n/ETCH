@@ -7,13 +7,10 @@
 // offsets + a light point), optionally animated; a polar clip mask
 // (ellipse/rect/triangle) bounds the field. p5 2D, looped animation.
 //
-// A faithful re-implementation (homage) of antlii's BIOM engine — algorithm,
-// parameter taxonomy, defaults and ranges studied from the public
-// antlii.github.io/biom-tool source. Original code, preset names and palettes;
-// antlii's poster/branding layout, fonts and watermark are omitted (we render
-// the graphics field on its own).
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
+// The graphics field is rendered on its own — no poster layout or type
+// furniture around it.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
 
 const { sin, cos, round, min, max, abs, PI, sign } = Math;
 const TWO_PI = PI * 2;

@@ -1,4 +1,4 @@
-// Lightweight animated Canvas2D previews for the antlii-stack landing cards.
+// Lightweight animated Canvas2D previews for the Etch-stack landing cards.
 // Each effect is an evocative approximation of the tool (not the real engine),
 // kept cheap so 8 can animate together. Drives canvas[data-preview="<name>"].
 

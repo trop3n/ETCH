@@ -1,4 +1,4 @@
-// Export controls for antlii tools, shared across every tool via attachExport:
+// Export controls for Etch tools, shared across every tool via attachExport:
 //  - PNG still (with integer upscale)
 //  - SVG (vector tools, when getSVG is provided)
 //  - Video recording (MediaRecorder) with fps, bitrate, and fixed-duration

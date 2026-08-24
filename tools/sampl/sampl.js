@@ -7,18 +7,15 @@
 // index), shrunk toward the path ends, and filled by one of several colour modes
 // (single / palette sequence / palette transition / linear & radial gradient /
 // dropped-image texture). The glyph outline itself can be drawn under the field.
-// A faithful re-implementation (homage) of antlii's SAMPL engine — algorithm,
-// parameter taxonomy, defaults and ranges studied from the public
-// antlii.github.io/sampl-tool source; the reference samples in a Web Worker, here
-// that's run synchronously on the shared Paper.js scope. Live render = 2D canvas
-// `ctx.fill(Path2D)`; SVG export = Paper.js reconstruction of the same field.
-// Original code, preset names and palettes.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { alea } from '../../js/antlii/noise.js';
+// Sampling runs synchronously on the shared Paper.js scope. Live render = 2D
+// canvas `ctx.fill(Path2D)`; SVG export = Paper.js reconstruction of the same
+// field.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
+import { alea } from '../../js/etch/noise.js';
 import { createNoise3D } from '../../js/vendor/simplex/simplex-noise.js';
-import { loadFont, parseFont, FONT_OPTIONS } from '../../js/antlii/typography.js';
-import { paletteLerp, attachPaletteControls } from '../../js/antlii/palette.js';
+import { loadFont, parseFont, FONT_OPTIONS } from '../../js/etch/typography.js';
+import { paletteLerp, attachPaletteControls } from '../../js/etch/palette.js';
 
 /////////////////////////////////////////////////////////////////////////////
 // Math + easing (subset of ease.js, referenced by the engine)
@@ -972,7 +969,7 @@ opts.addBinding(cnv, 'animation', { label: 'Animate' }).on('change', () => { cnv
 opts.addButton({ title: 'Fullscreen (f)' }).on('click', () => tool.toggleFullscreen());
 
 window.addEventListener('resize', fitCanvas);
-// Dev hook — drive presets / inspect state / feed live antlii presets for A/B.
+// Dev hook — drive presets / inspect state / feed in external preset objects.
 exposeDebug('sampl', { applyPreset, regenerate, renderSVG, updateFrameObjectData, cnv, params, sample, palette, get textObject() { return textObject; }, get F() { return F; }, presets, setFrame: (f) => { cnv.frame = f; } });
 
 bgUI(); fillUI();

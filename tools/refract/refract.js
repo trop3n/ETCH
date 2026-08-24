@@ -2,10 +2,10 @@
 // Box (cell hash), Flow (FBM simplex), and Sine displacement modes, plus an
 // optional grid lens, mirror-wrapped at the edges. Runs on p5.js WebGL; the
 // shader logic is adapted from the repo's raw-WebGL refract tool into a single
-// combined pass. First shader tool on the antlii stack (unlocks BLUUR, DITHR).
-import { createTool } from '../../js/antlii/shell.js';
-import { attachPresets } from '../../js/antlii/presets.js';
-import { attachExport } from '../../js/antlii/export.js';
+// combined pass. First shader tool on the Etch stack (unlocks BLUUR, DITHR).
+import { createTool } from '../../js/etch/shell.js';
+import { attachPresets } from '../../js/etch/presets.js';
+import { attachExport } from '../../js/etch/export.js';
 
 const params = {
   displaceMode: 'box', seed: 601, contentScaleX: 1, contentScaleY: 1, animate: false,

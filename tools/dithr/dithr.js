@@ -6,16 +6,13 @@
 // colour-remapped through a 1-D palette gradient. Brightness / contrast /
 // saturation / posterization sit between the source and the dither.
 //
-// A faithful re-implementation (homage) of antlii's DITHR engine — algorithm,
-// parameter taxonomy, defaults and ranges studied from the public
-// antlii.github.io/dithr-tool source. The five fragment shaders are third-party
-// open source kept with attribution (Sean LeBlanc ordered-dither, Stefan
-// Gustavson CMYK halftone, humanbydefinition ASCII — all MIT / public domain).
-// Original code, preset names, palettes, fonts; 3D primitives replace antlii's
-// OBJ letter models and procedural noise replaces their blue-noise PNGs.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { alea } from '../../js/antlii/noise.js';
+// The five fragment shaders are third-party open source, kept with attribution
+// (Sean LeBlanc ordered-dither, Stefan Gustavson CMYK halftone, humanbydefinition
+// ASCII — all MIT / public domain). Source geometry is a set of lit 3D
+// primitives; the noise threshold texture is generated procedurally.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
+import { alea } from '../../js/etch/noise.js';
 
 const { sin, cos, floor, ceil, round, sqrt, min, max, abs, PI } = Math;
 const TWO_PI = PI * 2;
@@ -38,7 +35,7 @@ function map2(value, s1, e1, s2, e2, type, when) {
 
 /////////////////////////////////////////////////////////////////////////////
 // Shaders — one full-screen vertex (p5 1.9.x convention: aPosition is already
-// clip-space; pass aTexCoord through), five fragments ported verbatim.
+// clip-space; pass aTexCoord through), five third-party fragments kept verbatim.
 /////////////////////////////////////////////////////////////////////////////
 // Full-screen quad: derive clip-space position from aTexCoord (reliably 0..1 over
 // a p5 rect, on the main canvas AND graphics buffers), so the pass always fills.

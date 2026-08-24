@@ -1,9 +1,9 @@
 // RITM — abstract waveform graphics from Simplex noise + a generative color
-// palette, on the shared p5 + Tweakpane shell. The antlii counterpart of the
+// palette, on the shared p5 + Tweakpane shell. The Etch counterpart of the
 // repo's raster `Rhythm` tool; the noise/waveform math is adapted from it.
-import { createTool } from '../../js/antlii/shell.js';
-import { attachPresets } from '../../js/antlii/presets.js';
-import { attachExport } from '../../js/antlii/export.js';
+import { createTool } from '../../js/etch/shell.js';
+import { attachPresets } from '../../js/etch/presets.js';
+import { attachExport } from '../../js/etch/export.js';
 
 const params = {
   waveform: 'noise',

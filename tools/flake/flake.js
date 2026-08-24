@@ -1,19 +1,17 @@
-// FLAKE — generative symmetrical patterns from a dense point field. A faithful
-// re-implementation (homage) of antlii's FLAKE engine: thousands of shape stamps
-// over a shuffled grid, where a single 4D-simplex sample per point drives BOTH
-// the stamp's size (a triangle wave within each palette band → concentric rings)
-// AND its color, with radial branch symmetry, swirl, a parametric polar mask, and
-// looped motion. Shapes blend on a transparent buffer, then composite over the bg.
-// Original code/shapes/presets; behaviour and parameter model studied from the
-// public antlii.github.io/flake-tool source. Math runs in a fixed render-space
-// (the ratio resolution) so parameter magnitudes match the reference.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { seedNoise, noise4D, alea } from '../../js/antlii/noise.js';
-import { buildLayers, toTransitionStops, paletteLerp, attachPaletteControls } from '../../js/antlii/palette.js';
+// FLAKE — generative symmetrical patterns from a dense point field: thousands of
+// shape stamps over a shuffled grid, where a single 4D-simplex sample per point
+// drives BOTH the stamp's size (a triangle wave within each palette band →
+// concentric rings) AND its color, with radial branch symmetry, swirl, a
+// parametric polar mask, and looped motion. Shapes blend on a transparent
+// buffer, then composite over the bg. Math runs in a fixed render-space (the
+// ratio resolution) so parameter magnitudes stay stable across canvas sizes.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
+import { seedNoise, noise4D, alea } from '../../js/etch/noise.js';
+import { buildLayers, toTransitionStops, paletteLerp, attachPaletteControls } from '../../js/etch/palette.js';
 
 /////////////////////////////////////////////////////////////////////////////
-// Small math helpers (plain JS so the port reads like the reference)
+// Small math helpers
 /////////////////////////////////////////////////////////////////////////////
 const PI = Math.PI, TWO_PI = Math.PI * 2, HALF_PI = Math.PI / 2;
 const { sin, cos, atan2, sqrt, pow, log, abs, floor, ceil } = Math;

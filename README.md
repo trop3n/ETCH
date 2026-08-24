@@ -1,4 +1,4 @@
-# Ksawery
+# Etch
 
 A suite of browser-based generative/visual tools — vector, type, shader, 3D, and
 image-manipulation instruments that run entirely client-side. No build step, no
@@ -12,20 +12,17 @@ Any static HTTP server works (ES modules + the vendored libs need same-origin):
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000/` — the **antlii-stack** suite (the current
-focus, 16 tools) plus the **classic** raster tools (12 earlier experiments), all
+Then open `http://localhost:8000/` — the **Etch stack** (the current
+focus, 16 tools) plus the **Classic** raster tools (12 earlier experiments), all
 on one page. Or navigate directly to `tools/<name>/`.
 
-> After editing a shared module under `js/antlii/`, hard-refresh (Ctrl/Cmd+Shift+R)
+> After editing a shared module under `js/etch/`, hard-refresh (Ctrl/Cmd+Shift+R)
 > or use a fresh tab — `http.server` sends no cache headers, so browsers may serve
 > a stale copy of the shared JS.
 
 ## The tools
 
-### antlii-stack (16)
-A personal homage to the [antlii.work](https://antlii.work) toolset by Anatolii
-Babii — original implementations inspired by his generative instruments, rebuilt
-from scratch. Not affiliated with or endorsed by the original author.
+### Etch stack (16)
 
 | Tool | What it does |
 |---|---|
@@ -46,7 +43,7 @@ from scratch. Not affiliated with or endorsed by the original author.
 | **STIIL** | Abstract graphics from images via stacked artistic effects |
 | **BOIDS** | Flocking simulation with shape, skew & velocity color |
 
-### classic (12)
+### Classic (12)
 The original vanilla-Canvas/WebGL experiments, in the Classic Tools section of
 the main page: dithering, cellular-automata, gradient-map, shapes, text,
 pixel-flow, pixelator, srt2video, video2midi, flipdigits, blob-tracker, mesher.
@@ -62,7 +59,7 @@ Preserved as-is.
   below), Tweakpane, JSZip, simplex-noise, and ffmpeg.wasm (single-threaded core,
   for WebM→MP4 transcode). The only remaining CDN dependencies are **p5.js** and
   **opentype.js** (jsdelivr), both SRI-pinned.
-- **Shared shell** (`js/antlii/`): `shell.js` (`createTool` — floating Tweakpane
+- **Shared shell** (`js/etch/`): `shell.js` (`createTool` — floating Tweakpane
   panel over a full-bleed canvas), `export.js` (PNG/SVG/video/frame-zip),
   `presets.js`, `palette.js`, `noise.js` (seedable 2D/3D/4D simplex), `typography.js`,
   `shapes.js`, `previews.js`. Each tool is a thin `tools/<name>/<name>.js` on top.
@@ -81,20 +78,18 @@ Preserved as-is.
 - Export: PNG (multi-res), SVG (vector tools), video (MediaRecorder WebM / native
   MP4 / in-browser ffmpeg.wasm transcode), and PNG/WebP frame-sequence zip.
 
-## Homage & IP posture
+## Third-party software
 
-The antlii-stack tools are **functional homages** — reimplementations of
-*behaviour* (algorithms, parameter taxonomy, defaults, interaction model) in our
-own code. They deliberately do **not** copy the original's preset names, curated
-palettes, bespoke shape art, branding, or watermark/license scripts. The
-recreation method and per-tool progress are documented in `Handoff.md`;
-`CLAUDE.md` and `AGENTS.md` describe the architecture for contributors.
+All under MIT or similarly permissive licenses. Paper.js, Tweakpane, JSZip,
+simplex-noise (Jonas Wagner) and ffmpeg.wasm are vendored under `js/vendor/`, so
+their license notices ship with this repo; p5.js and opentype.js load from a CDN.
 
-## Credits
+Some tools incorporate third-party routines, each attributed inline in its source:
 
-Built by the repo author. Third-party libraries (all MIT/permissive): p5.js,
-Paper.js, opentype.js, Tweakpane, JSZip, simplex-noise (Jonas Wagner),
-ffmpeg.wasm. The boids flocking math in **BOIDS** is adapted from Daniel Huang's
-MIT-licensed implementation. DITHR's dither shaders incorporate third-party
-open-source routines (ordered-dither, CMYK halftone, ASCII) kept verbatim with
-attribution in `tools/dithr/dithr.js`.
+- **BOIDS** — vector class and flocking math adapted from Daniel Huang's
+  [boids](https://github.com/cubeDhuang/boids) (MIT).
+- **DITHR** — ordered-dither by Sean S. LeBlanc (MIT), CMYK rosette halftone by
+  Stefan Gustavson adapted by Matt DesLauriers (MIT), and an ASCII shader by
+  humanbydefinition; ported verbatim.
+- **SKAAAN** — easing curves (Penner) via Manohar Vanga / Jeff Thompson's
+  [sighack](https://sighack.com/post/easing-functions-in-processing) (MIT).

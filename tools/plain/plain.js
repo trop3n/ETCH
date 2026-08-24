@@ -2,11 +2,11 @@
 // displaced by multi-octave simplex (fbm) noise and rendered as flat-shaded
 // facets (per-face normals + lighting) with height-based palette coloring,
 // tilt + auto-rotation, and wireframe options. p5 WebGL; proves the 3D path.
-import { createTool } from '../../js/antlii/shell.js';
-import { attachPresets } from '../../js/antlii/presets.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { noise3D } from '../../js/antlii/noise.js';
-import { interpolateHex } from '../../js/antlii/palette.js';
+import { createTool } from '../../js/etch/shell.js';
+import { attachPresets } from '../../js/etch/presets.js';
+import { attachExport } from '../../js/etch/export.js';
+import { noise3D } from '../../js/etch/noise.js';
+import { interpolateHex } from '../../js/etch/palette.js';
 
 const DEG = Math.PI / 180;
 

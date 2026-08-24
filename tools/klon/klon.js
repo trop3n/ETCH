@@ -8,15 +8,12 @@
 // switch that samples either the source image or the accumulating result.
 // Source defaults to a procedurally-generated image; drop one to load your own.
 //
-// A faithful re-implementation (homage) of antlii's KLON engine — algorithm,
-// shape masks (incl. triangle by 90° orientation), grid snap (cells = 2^n based
-// on image size), and the select/draw/erase mode tree, studied from the public
-// antlii.github.io/klon-tool source. Original code, default image; antlii's
-// stock photo, branding, watermark and license are omitted.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
+// Shape masks include triangles by 90° orientation; grid snap uses cells of
+// 2^n derived from the image size.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
 import { createNoise2D } from '../../js/vendor/simplex/simplex-noise.js';
-import { alea } from '../../js/antlii/noise.js';
+import { alea } from '../../js/etch/noise.js';
 
 const { sin, cos, round, floor, min, max, pow, abs, PI } = Math;
 const HALF_PI = PI / 2;
@@ -79,7 +76,7 @@ let mx = 0, my = 0, overCanvas = false, leftDown = false, shiftDown = false;
 let mxLocked = false, myLocked = false, lockX = 0, lockY = 0;
 
 /////////////////////////////////////////////////////////////////////////////
-// Default procedural image (antlii ships a stock photo; we generate ours)
+// Default procedural image (generated, so the tool ships with no bundled photo)
 /////////////////////////////////////////////////////////////////////////////
 function makeDefaultImage() {
   const w = 1280, h = 960;

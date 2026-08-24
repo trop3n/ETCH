@@ -2,18 +2,15 @@
 // (weighted by an alignment bias) over a spatial-hash grid, with edge wrap or
 // repel, mouse attract/repel, per-boid noise wander, and shapes (ellipse / rect
 // / triangle / mixed) rendered as vector fills+strokes or windows into a dropped
-// image — colored & skewed by speed or heading. A faithful re-implementation
-// (homage) of antlii's BOIDS tool: parameter model, derived-global mapping and
-// render pipeline studied from the public antlii.github.io/boids-tool source;
-// the simulation runs in a fixed render-space (the ratio resolution) so the
-// scale/vision magnitudes match the reference. Original presets/palettes; we
-// ship no texture (drop your own image for the texture modes).
+// image — colored & skewed by speed or heading. The simulation runs in a fixed
+// render-space (the ratio resolution) so scale/vision magnitudes stay stable
+// across canvas sizes. No texture ships with the tool — drop your own image for
+// the texture modes.
 //
 // The V2D vector class and the core flocking math are adapted from Daniel
-// Huang's MIT-licensed boids (https://github.com/cubeDhuang/boids), the same
-// basis the reference credits.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
+// Huang's MIT-licensed boids (https://github.com/cubeDhuang/boids).
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
 
 /////////////////////////////////////////////////////////////////////////////
 // Math helpers

@@ -1,22 +1,17 @@
 // BLUUR — a shuffled grid of forms (rounded rects or dropped SVG shapes), each
 // stamped into an offscreen buffer with its own seeded gaussian blur, blend mode
 // and procedural colour, then post-processed with a full-screen blur, brightness/
-// contrast and film grain. A faithful re-implementation (homage) of antlii's
-// BLUUR engine: behaviour + parameter model studied from the public
-// antlii.github.io/bluur-tool source. The reference draws the form field on a 2D
-// `gForm` canvas (per-shape `ctx.filter` blur) and only uses GLSL for the post
-// pass — here the whole pipeline runs on 2D canvas (per-shape blur + native
-// blur/brightness/contrast filters + a procedural grain overlay), which matches
-// its behaviour. Original code, preset names and palettes; procedural colour is
-// the public-domain Inigo Quilez cosine-palette formula the original also uses.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { seedNoise, noise2D, noise3D, alea } from '../../js/antlii/noise.js';
-import { interpolateHex, attachPaletteControls } from '../../js/antlii/palette.js';
+// contrast and film grain. The whole pipeline runs on 2D canvas — per-shape
+// `ctx.filter` blur into a `gForm` buffer, then native blur/brightness/contrast
+// filters plus a procedural grain overlay for the post pass. Procedural colour
+// is the public-domain Inigo Quilez cosine-palette formula.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
+import { seedNoise, noise2D, noise3D, alea } from '../../js/etch/noise.js';
+import { interpolateHex, attachPaletteControls } from '../../js/etch/palette.js';
 
 /////////////////////////////////////////////////////////////////////////////
-// Math helpers (plain JS; angles in degrees where the form transforms use them,
-// matching the reference's gForm.angleMode(DEGREES)).
+// Math helpers (angles in degrees where the form transforms use them).
 /////////////////////////////////////////////////////////////////////////////
 const { sin, cos, floor, ceil, abs, max, min, sqrt, pow, PI } = Math;
 const TWO_PI = PI * 2;
@@ -779,7 +774,7 @@ function resetToDefaults() {
   deepMerge(palette, structuredClone(DEFAULTS.palette));
   svg.shape = [];
 }
-// Accepts a reference-shaped config object (preset or live antlii preset for A/B).
+// Accepts a preset name, or any config object of the same shape.
 function applyPreset(name) {
   const pr = typeof name === 'string' ? presets[name] : name;
   if (!pr) return;
@@ -814,7 +809,7 @@ opts.addBinding(cnv, 'animation', { label: 'Animate' }).on('change', () => { cnv
 opts.addButton({ title: 'Fullscreen (f)' }).on('click', () => tool.toggleFullscreen());
 
 window.addEventListener('resize', () => { if (isReady) updateCanvas(); });
-// Dev hook — drive presets / inspect state / feed live antlii presets for A/B.
+// Dev hook — drive presets / inspect state / feed in external preset objects.
 exposeDebug('bluur', { applyPreset, createForms, randomParams, cnv, form, post, palette, svg, presets, setFrame: (f) => { cnv.frame = f; } });
 
 // Bootstrap the opening preset on the first draw tick (p5 setup may run sync or

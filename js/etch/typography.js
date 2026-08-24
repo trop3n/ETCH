@@ -1,4 +1,4 @@
-// Typography pipeline for antlii tools (SAMPL, TEXTR, RASTR).
+// Typography pipeline for Etch tools (SAMPL, TEXTR, RASTR).
 // Loads fonts — built-in open-source Google TTFs via CDN, or a dropped TTF/OTF —
 // using opentype.js (window.opentype, loaded by the host page), and converts text
 // into SVG path-data strings that Paper.js can import as vector outlines.

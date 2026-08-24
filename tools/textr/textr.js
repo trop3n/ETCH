@@ -4,18 +4,14 @@
 // so the text mass forms shapes (diamonds, waves), and every copy is displaced
 // perpendicular to the layout axis by a sine / double-sine / 4D-noise wave whose
 // phase is driven by the copy index AND the row's position (a travelling wave),
-// with optional scale modulation, collision spacing and infinite scroll. A
-// faithful re-implementation (homage) of antlii's TEXTR engine — behaviour +
-// parameter model studied from the public antlii.github.io/textr-tool source.
-// The reference lays glyphs out with fontkit; here that's reimplemented on
-// opentype.js (our stack's font lib). Live render = p5 2D + `ctx.fill(Path2D)`;
-// SVG export = Paper.js reconstruction of the same arrangement. Original code,
-// preset names and palettes.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
-import { alea } from '../../js/antlii/noise.js';
+// with optional scale modulation, collision spacing and infinite scroll. Glyph
+// layout runs on opentype.js. Live render = p5 2D + `ctx.fill(Path2D)`; SVG
+// export = Paper.js reconstruction of the same arrangement.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
+import { alea } from '../../js/etch/noise.js';
 import { createNoise2D, createNoise4D } from '../../js/vendor/simplex/simplex-noise.js';
-import { loadFont, parseFont, FONT_OPTIONS } from '../../js/antlii/typography.js';
+import { loadFont, parseFont, FONT_OPTIONS } from '../../js/etch/typography.js';
 
 /////////////////////////////////////////////////////////////////////////////
 // Math + easing (port of ease.js — referenced by name from params)
@@ -700,7 +696,7 @@ opts.addBinding(cnv, 'animation', { label: 'Animate' }).on('change', () => { cnv
 opts.addButton({ title: 'Fullscreen (f)' }).on('click', () => tool.toggleFullscreen());
 
 window.addEventListener('resize', fitCanvas);
-// Dev hook — drive presets / inspect state / feed live antlii presets for A/B.
+// Dev hook — drive presets / inspect state / feed in external preset objects.
 exposeDebug('textr', { applyPreset, generateForms, renderSVG, cnv, params, textr, presets, setFrame: (f) => { cnv.frame = f; } });
 
 bgUI(); countUI();

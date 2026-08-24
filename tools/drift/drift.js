@@ -7,15 +7,12 @@
 // Sample with the mouse (drag to set, release to spawn; wheel resizes the
 // window), or spawn random ones. p5 2D; drop an image to load your own.
 //
-// A faithful re-implementation (homage) of antlii's DRIFT engine — algorithm,
-// parameter taxonomy, defaults and ranges studied from the public
-// antlii.github.io/drift-tool source. Original code, preset names and the
-// procedurally-generated default image (antlii ships a stock photo + branding,
-// both omitted). The Form animation channels + edge-wrap are ported faithfully.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
+// The default image is generated procedurally, so the tool ships with no
+// bundled photo.
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
 import { createNoise2D } from '../../js/vendor/simplex/simplex-noise.js';
-import { alea } from '../../js/antlii/noise.js';
+import { alea } from '../../js/etch/noise.js';
 
 const { sin, cos, abs, min, max, round, floor, PI } = Math;
 const TWO_PI = PI * 2;
@@ -355,7 +352,7 @@ function addRandomFormsOnStartup() { for (let i = 0; i < form.startup; i++) spaw
 function checkFormsAmount() { while (form.array.length > form.amount.num) { form.array[form.array.length - 1].dispose(); form.array.pop(); } }
 
 /////////////////////////////////////////////////////////////////////////////
-// Default image — procedural (antlii ships a stock photo; we generate one)
+// Default image — generated procedurally, so nothing is bundled
 /////////////////////////////////////////////////////////////////////////////
 function makeDefaultImage() {
   const w = 1280, h = 960;

@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Ksawery is a collection of browser-based visual/creative tools. There is **no build system, bundler, or transpiler** — files are served as-is. Two families of tools live side by side:
+Etch is a collection of browser-based visual/creative tools. There is **no build system, bundler, or transpiler** — files are served as-is. Two families of tools live side by side:
 
-1. **antlii-stack tools** (the current focus) — a recreation/homage of the antlii.work generative toolset (artist Anatolii Babii), built on **p5.js + Tweakpane + Paper.js + opentype.js**, with a shared shell in `js/antlii/`. 16 tools.
-2. **Legacy raster tools** — the original vanilla-Canvas/WebGL tools, untouched. 12 tools (the four superseded by antlii recreations — flake, refract, boids, rhythm — were deleted). Intentionally preserved.
+1. **Etch-stack tools** (the current focus) — a recreation/homage of the antlii.work generative toolset (artist Anatolii Babii), built on **p5.js + Tweakpane + Paper.js + opentype.js**, with a shared shell in `js/etch/`. 16 tools.
+2. **Legacy raster tools** — the original vanilla-Canvas/WebGL tools, untouched. 12 tools (the four superseded by Etch-stack recreations — flake, refract, boids, rhythm — were deleted). Intentionally preserved.
 
-The root `index.html` is the single landing page: the antlii grid plus a Classic Tools section listing the legacy tools.
+The root `index.html` is the single landing page: the Etch grid plus a Classic Tools section listing the legacy tools.
 
 > Background: `antlii-spec.md`, `antlii-tool-specs.md`, and `antlii-recreation-plan.md` document the audit of the live antlii.work site and the recreation plan. The recreation goal is functional homage — original code/presets/copy, not asset/branding copies.
 >
@@ -27,14 +27,14 @@ Open `index.html`, or navigate directly to `tools/<name>/`.
 
 There are no tests, linters, or build steps — **verify changes by opening the tool in a browser** (watch the console; screenshot the canvas).
 
-**Dev gotcha:** `python -m http.server` sends no cache headers, so after editing a shared module (e.g. `js/antlii/export.js`) the browser may serve the cached old copy. Hard-refresh (Ctrl/Cmd+Shift+R) or use a fresh tab to pick up shared-module edits.
+**Dev gotcha:** `python -m http.server` sends no cache headers, so after editing a shared module (e.g. `js/etch/export.js`) the browser may serve the cached old copy. Hard-refresh (Ctrl/Cmd+Shift+R) or use a fresh tab to pick up shared-module edits.
 
 ---
 
-## Architecture A — antlii-stack tools (current)
+## Architecture A — Etch-stack tools (current)
 
 ### Layout
-Each tool is `tools/<name>/index.html` + `tools/<name>/<name>.js`. The HTML loads the libraries the tool needs and the module; the module builds the tool on the shared shell. Three tools carry a `-tool` suffix (`flake-tool`, `refract-tool`, `boids-tool`) — an artifact of since-deleted same-named legacy dirs, kept for URL stability.
+Each tool is `tools/<name>/index.html` + `tools/<name>/<name>.js`. The HTML loads the libraries the tool needs and the module; the module builds the tool on the shared shell.
 
 ### Libraries (loaded per page; no bundler)
 - **Tweakpane** (control panel) — ESM via import map: `<script type="importmap">{ "imports": { "tweakpane": "https://esm.sh/tweakpane@4.0.5" } }</script>`, then `import { Pane } from 'tweakpane'`.
@@ -44,7 +44,7 @@ Each tool is `tools/<name>/index.html` + `tools/<name>/<name>.js`. The HTML load
 - **JSZip** — dynamic `import('https://esm.sh/jszip@3.10.1')` inside `export.js` (frame-sequence zip; only fetched on use).
 - **ffmpeg.wasm** — **vendored** in `js/vendor/ffmpeg/` (same-origin so the module Worker + ESM core load without COOP/COEP). Single-threaded core; `ffmpeg-core.wasm` is ~32 MB and is committed (not gitignored). Only loaded on first MP4 export.
 
-### Shared modules — `js/antlii/`
+### Shared modules — `js/etch/`
 - **`shell.js`** — `createTool({ name, version, backHref })` → `{ root, pane, pages: {main, export, options}, canvasHost, startSketch(factory), mountCanvas(), getCanvas(), toggleFullscreen() }`. Builds a floating Tweakpane panel (tabs `MAIN / EXPORT / OPTIONS`) over a full-bleed canvas. `startSketch(fn)` runs a p5 instance-mode sketch in `canvasHost`; `mountCanvas()` returns a bare `<canvas>` for Paper.js tools. Fullscreen on the `f` key.
 - **`presets.js`** — `attachPresets(page, { pane, params, presets, randomize?, onApply? })`. Named-preset dropdown + Restart + Randomize + JSON import/export. Presets and files operate on the plain `params` object; call `pane.refresh()` after mutating it (handled internally).
 - **`export.js`** — `attachExport(page, { getCanvas, getSVG?, name })`. PNG (multi-res), SVG (if `getSVG`), **video** (MediaRecorder WebM / native MP4 / vendored-ffmpeg WebM→MP4 transcode; fps + bitrate + auto-stop), and **PNG/WebP frame-sequence zip**. Every tool gets all of it for free.
@@ -64,7 +64,7 @@ Each tool is `tools/<name>/index.html` + `tools/<name>/<name>.js`. The HTML load
 - **Render cadence:** animated tools rebuild every frame; static/on-change tools use a `dirty` flag set via `tool.pane.on('change', () => dirty = true)`.
 
 ### Landing
-`index.html` — antlii grid + Classic Tools grid (`tool-card` + `canvas[data-preview]`). Driven by `js/index-previews.js`, which runs both preview modules (`js/antlii/previews.js` + legacy `js/previews.js`; their key sets are disjoint).
+`index.html` — Etch grid + Classic Tools grid (`tool-card` + `canvas[data-preview]`). Driven by `js/index-previews.js`, which runs both preview modules (`js/etch/previews.js` + legacy `js/previews.js`; their key sets are disjoint).
 
 ---
 
@@ -84,24 +84,24 @@ Conventions: sidebar (`.tool-sidebar`, 280px) on the left, canvas fills the rest
 
 Single stylesheet for everything. CSS variables (`:root`): `--bg`, `--surface`, `--surface-2`, `--border`, `--text`, `--text-dim`, `--accent`, `--mono` (IBM Plex Mono), `--sans` (IBM Plex Sans).
 - Legacy layout: `.tool-layout`, `.tool-sidebar`, `.tool-canvas-area`, control components (`.control-group`, `.range-row`, `.radio-row`, `.color-swatch-row`, `.btn`, `.separator`).
-- antlii layout: `.antlii-tool` / `.antlii-canvas` / `.antlii-pane` / `.antlii-back`; landing extras `.index-nav` / `.index-about` (the index grid reuses `.index-page` / `.tools-grid` / `.tool-card`). Tweakpane injects its own CSS at runtime.
+- Etch layout: `.etch-tool` / `.etch-canvas` / `.etch-pane` / `.etch-back`; landing extras `.index-nav` / `.index-about` (the index grid reuses `.index-page` / `.tools-grid` / `.tool-card`). Tweakpane injects its own CSS at runtime.
 
 ## Tools
 
-**antlii-stack (16):** FLAKE `flake-tool`, SPLITX `splitx`, BLUUR `bluur`, TEXTR `textr`, SAMPL `sampl`, RASTR `rastr`, RITM `ritm`, REFRACT `refract-tool`, DITHR `dithr`, PLAIN `plain`, BIOM `biom`, DRIFT `drift`, KLON `klon`, SKAAAN `skaaan`, STIIL `stiil`, BOIDS `boids-tool`.
+**Etch stack (16):** FLAKE `flake`, SPLITX `splitx`, BLUUR `bluur`, TEXTR `textr`, SAMPL `sampl`, RASTR `rastr`, RITM `ritm`, REFRACT `refract`, DITHR `dithr`, PLAIN `plain`, BIOM `biom`, DRIFT `drift`, KLON `klon`, SKAAAN `skaaan`, STIIL `stiil`, BOIDS `boids`.
 
 **Legacy (12):** blob-tracker, cellular-automata, dithering, flipdigits, gradient-map, mesher, pixel-flow, pixelator, shapes, srt2video, text, video2midi.
 
-## Adding an antlii-stack tool
+## Adding an Etch-stack tool
 
-1. Copy the closest existing tool of the same type (raster → `ritm`, vector → `splitx`, shader → `refract-tool`, type → `textr`, image-manip → `skaaan`).
+1. Copy the closest existing tool of the same type (raster → `ritm`, vector → `splitx`, shader → `refract`, type → `textr`, image-manip → `skaaan`).
 2. `tools/<name>/index.html`: the Tweakpane import map + the global `<script>`s the tool needs (p5 and/or paper-full and/or opentype.js), then `<script type="module" src="<name>.js">`.
 3. `tools/<name>/<name>.js`: `createTool(...)`, build folders/bindings on `tool.pages.main`, `attachExport` + `attachPresets`, render via `startSketch`/`mountCanvas`. Reuse `noise`/`shapes`/`palette`/`typography` as needed.
-4. Add a card to `index.html` and a preview effect to `js/antlii/previews.js`.
+4. Add a card to `index.html` and a preview effect to `js/etch/previews.js`.
 
 ## Conventions
 
 - **No bundler/build, ever** — CDN + import maps for libs, vendored ffmpeg for offline-safe MP4.
 - **One shared stylesheet** (`css/style.css`); no tool-specific CSS files.
-- **Comment-light code.** Exception: each `js/antlii/` shared module has a short header comment documenting its role/API.
+- **Comment-light code.** Exception: each `js/etch/` shared module has a short header comment documenting its role/API.
 - **No tests** — verify in a browser.

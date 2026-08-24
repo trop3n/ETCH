@@ -8,17 +8,13 @@
 // accumulates a displacement-art frame. Optional grain overlay perturbs each
 // slice. Drop an image to load your own; default is procedurally generated.
 //
-// A faithful re-implementation (homage) of antlii's SKAAAN engine — channel
-// model, transitions, easing-aware area windows, and the scan mechanic, studied
-// from the public antlii.github.io/skaaan-tool source. Original code, default
-// image; antlii's cover photo, branding, watermark and license are omitted.
 // The map2 easings (Linear / Quadratic / Cubic / Quartic / Quintic / Sinusoidal
 // / Exponential / Circular / Sqrt × IN / OUT / BOTH) are ported as-is — these
 // are standard easing curves (Penner / sighack), kept with attribution.
-import { createTool, exposeDebug } from '../../js/antlii/shell.js';
-import { attachExport } from '../../js/antlii/export.js';
+import { createTool, exposeDebug } from '../../js/etch/shell.js';
+import { attachExport } from '../../js/etch/export.js';
 import { createNoise2D } from '../../js/vendor/simplex/simplex-noise.js';
-import { alea } from '../../js/antlii/noise.js';
+import { alea } from '../../js/etch/noise.js';
 
 const { sin, cos, sqrt, pow, abs, min, max, round, floor, ceil, PI } = Math;
 const HALF_PI = PI / 2;

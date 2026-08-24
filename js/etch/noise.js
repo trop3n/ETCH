@@ -1,6 +1,6 @@
-// Seedable simplex noise (2D/3D/4D) shared across antlii tools. Wraps the
+// Seedable simplex noise (2D/3D/4D) shared across Etch tools. Wraps the
 // vendored simplex-noise lib, seeded via alea so a given seed reproduces a
-// pattern exactly (matching antlii's alea+simplex pairing). 4D is used by tools
+// pattern exactly. 4D is used by tools
 // that loop motion through two extra noise dimensions (e.g. FLAKE). Same API as
 // before — seedNoise/noise2D/noise3D — plus noise4D and the alea PRNG.
 import { createNoise2D, createNoise3D, createNoise4D } from '../vendor/simplex/simplex-noise.js';

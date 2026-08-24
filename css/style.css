@@ -409,24 +409,24 @@ input[type="range"]::-moz-range-thumb {
   background: #444;
 }
 
-/* ---- antlii-style tools (p5 + Tweakpane shell) ---- */
-.antlii-tool {
+/* ---- Etch tools (p5 + Tweakpane shell) ---- */
+.etch-tool {
   position: fixed;
   inset: 0;
   background: var(--bg);
   overflow: hidden;
 }
 
-.antlii-canvas {
+.etch-canvas {
   position: absolute;
   inset: 0;
 }
 
-.antlii-canvas canvas {
+.etch-canvas canvas {
   display: block;
 }
 
-.antlii-pane {
+.etch-pane {
   position: absolute;
   top: 12px;
   left: 12px;
@@ -436,9 +436,9 @@ input[type="range"]::-moz-range-thumb {
   z-index: 10;
 }
 
-/* antlii-style theme for the Tweakpane (v4) panel — dark, compact, monospace,
-   matching the live antlii tools while staying cohesive with this site. */
-.antlii-pane {
+/* Etch theme for the Tweakpane (v4) panel — dark, compact, monospace,
+   cohesive with the rest of the site. */
+.etch-pane {
   --tp-base-background-color: rgba(18, 18, 20, 0.94);
   --tp-base-shadow-color: rgba(0, 0, 0, 0.45);
   --tp-button-background-color: #2a2a2e;
@@ -461,10 +461,10 @@ input[type="range"]::-moz-range-thumb {
   --tp-monitor-background-color: rgba(0, 0, 0, 0.32);
   --tp-monitor-foreground-color: #b0b0b0;
 }
-.antlii-pane .tp-dfwv { font-family: var(--mono); font-size: 11px; }
-.antlii-pane .tp-rotv_t { letter-spacing: 0.04em; }
+.etch-pane .tp-dfwv { font-family: var(--mono); font-size: 11px; }
+.etch-pane .tp-rotv_t { letter-spacing: 0.04em; }
 
-.antlii-back {
+.etch-back {
   position: absolute;
   bottom: 12px;
   left: 12px;
@@ -478,12 +478,12 @@ input[type="range"]::-moz-range-thumb {
   padding: 6px 10px;
 }
 
-.antlii-back:hover {
+.etch-back:hover {
   color: var(--text);
   border-color: var(--accent);
 }
 
-/* ---- antlii landing extras ---- */
+/* ---- Etch landing extras ---- */
 .index-nav {
   display: flex;
   justify-content: space-between;

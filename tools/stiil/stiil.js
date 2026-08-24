@@ -2,9 +2,9 @@
 // adjustments, posterize, duotone, mosaic, mirror, grain and scanlines. Rebuilt
 // on change (stills). p5 2D. Drop an image to load your own. Part of the image-
 // manipulation family.
-import { createTool } from '../../js/antlii/shell.js';
-import { attachPresets } from '../../js/antlii/presets.js';
-import { attachExport } from '../../js/antlii/export.js';
+import { createTool } from '../../js/etch/shell.js';
+import { attachPresets } from '../../js/etch/presets.js';
+import { attachExport } from '../../js/etch/export.js';
 
 const params = {
   brightness: 0, contrast: 20, saturation: 60, invert: false,

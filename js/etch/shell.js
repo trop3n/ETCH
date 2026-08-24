@@ -1,4 +1,4 @@
-// Shared shell for antlii-style tools: a floating Tweakpane control panel
+// Shared shell for Etch tools: a floating Tweakpane control panel
 // (MAIN / EXPORT / OPTIONS tabs) over a full-bleed p5 canvas. Reused by every
 // tool built on the new stack. p5 is loaded as a global (window.p5) by the
 // host page; Tweakpane is imported as an ES module.
@@ -6,18 +6,18 @@ import { Pane } from '../vendor/tweakpane/tweakpane.min.js';
 
 export function createTool({ name, version = '0.1', backHref = '../../' }) {
   const root = document.createElement('div');
-  root.className = 'antlii-tool';
+  root.className = 'etch-tool';
 
   const canvasHost = document.createElement('div');
-  canvasHost.className = 'antlii-canvas';
+  canvasHost.className = 'etch-canvas';
   root.appendChild(canvasHost);
 
   const paneHost = document.createElement('div');
-  paneHost.className = 'antlii-pane';
+  paneHost.className = 'etch-pane';
   root.appendChild(paneHost);
 
   const back = document.createElement('a');
-  back.className = 'antlii-back';
+  back.className = 'etch-back';
   back.href = backHref;
   back.textContent = '← Tools';
   root.appendChild(back);
@@ -65,8 +65,8 @@ export function createTool({ name, version = '0.1', backHref = '../../' }) {
   return { root, pane, pages, canvasHost, startSketch, mountCanvas, getCanvas, toggleFullscreen };
 }
 
-// Dev hooks (window.__<name>) are useful for A/B-driving a tool against its
-// live antlii.work counterpart, but pollute the global namespace in production.
+// Dev hooks (window.__<name>) are useful for driving a tool from the console
+// during development, but pollute the global namespace in production.
 // `exposeDebug(name, obj)` attaches `window.__<name>` only when the URL has
 // `?debug` AND the page is served from a local dev origin (localhost / 127.0.0.1
 // / *.local) — so the hook stays available during development but is inert on a

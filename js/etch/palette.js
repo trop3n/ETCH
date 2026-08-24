@@ -1,4 +1,4 @@
-// Color + palette system shared by antlii tools: hex interpolation, solid/
+// Color + palette system shared by Etch tools: hex interpolation, solid/
 // sequence/transition picking, a curated palette library with random/shuffle,
 // seed-shuffled transition layers, and a Tweakpane (v4) swatch + random UI.
 // Dependency-free: callers pass their own RNG (e.g. alea(seed)) for determinism.
@@ -20,7 +20,7 @@ export function pickColor(colors, mode, i, n) {
   return interpolateHex(colors[k], colors[Math.min(k + 1, colors.length - 1)], tt - k);
 }
 
-// Curated palettes — original selections (not antlii's set). Light→dark / by hue;
+// Curated palettes. Light→dark / by hue;
 // randomPalette() may reverse them.
 export const PALETTES = [
   ['#0a2a6b', '#2f6fed', '#43d9ff', '#bff3ff', '#ffffff'],
