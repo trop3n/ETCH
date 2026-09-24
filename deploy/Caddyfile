@@ -1,0 +1,61 @@
+# Etch — static site, served by Caddy on the LAN.
+#
+# Replaces the old vercel.json. Two behaviours carried over from it:
+#   - trailing-slash URLs  (file_server 301s /tools/flake -> /tools/flake/ on its own)
+#   - no-cache on the app's own source, so an rsync is live immediately
+# plus three things Vercel did for free that a bare web server does not.
+
+:80 {
+	root * /srv/etch
+	file_server
+	encode zstd gzip
+
+	# ffmpeg.load() hands the .wasm to WebAssembly.instantiateStreaming, which
+	# hard-fails on a wrong Content-Type. Caddy's defaults are right; this makes
+	# it explicit so a future base-image change can't silently break MP4 export.
+	@wasm path *.wasm
+	header @wasm Content-Type application/wasm
+
+	# The app's own source is never cached — deploy, reload, done.
+	@app {
+		path *.js *.css *.html */
+		not path /js/vendor/*
+	}
+	header @app Cache-Control "no-cache"
+
+	# Vendored libs are immutable, and js/vendor/ffmpeg/core/ffmpeg-core.wasm is
+	# 31 MB of the 33 MB payload — re-fetching it per visit is the whole load time.
+	@vendor path /js/vendor/*
+	header @vendor Cache-Control "public, max-age=31536000, immutable"
+
+	# An error response under /js/vendor/* would otherwise inherit the immutable
+	# header above and be cached for a year, so a transient 403/404 outlives the
+	# fix that repaired it (this cost real debugging time once). Stripping the
+	# header leaves errors with no caching directive, which is what we want; a
+	# `header Cache-Control "no-store"` here does nothing, because Caddy applies
+	# header deletions after additions.
+	handle_errors {
+		header -Cache-Control
+		respond "{err.status_code} {err.status_text}" {err.status_code}
+	}
+
+	log {
+		output file /var/log/caddy/etch.log
+		format console
+	}
+}
+
+# ─── TLS ───────────────────────────────────────────────────────────────────
+# Caddy stays on plain :80 on purpose. HTTPS is handled by Tailscale, which
+# terminates TLS on the tailnet name with a genuinely trusted cert and proxies
+# back here:  tailscale serve --bg 80
+# That HTTPS address is what makes camera input and TERMNL's clipboard export
+# work — they are secure-context-only and stay inert over the LAN http:// address.
+#
+# To also go public later, change `:80 {` above to `yourdomain {`; Caddy then
+# provisions a Let's Encrypt cert itself, given an A record and :80/:443 reachable
+# from the internet. The Tailscale path keeps working alongside it.
+#
+# Do not add a Content-Security-Policy header here: every page already ships one
+# in a <meta> tag, and a second CSP intersects with the first rather than
+# replacing it, which would break the tools in ways that are painful to debug.
