@@ -2,13 +2,27 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# Agent / tooling scratch
+.claude/
 .playwright-mcp/
 
-# Internal docs (agent handoff / architecture / antlii specs) — kept locally, not
-# for the public or deployed repo.
-Handoff.md
-CLAUDE.md
+# Internal docs — working notes, deliberately not part of this repo. It is a
+# public, browsable portfolio; these are not for it.
+#
+# READ THIS BEFORE TRUSTING THE LINES BELOW. Listing a path here does nothing
+# if the path is already tracked: git consults .gitignore only for untracked
+# paths. Every doc below was listed here for months while still being committed
+# and pushed, and nothing warned about it. To verify this file is actually
+# doing its job:
+#
+#     git ls-files | git check-ignore --stdin --no-index
+#
+# Whatever that prints is ignored AND tracked — i.e. still being published.
+# Untrack it with `git rm --cached <path>` (keeps your local copy).
+# The --no-index flag is essential: without it check-ignore consults the index
+# and stays silent about precisely the files that are broken.
 AGENTS.md
-antlii-recreation-plan.md
-antlii-spec.md
-antlii-tool-specs.md
+CLAUDE.md
+Handoff.md
+antlii-*.md
